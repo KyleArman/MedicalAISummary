@@ -8,29 +8,29 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 10px;
             background-color: #f8f9fa;
         }
         .top-image {
-            max-width: 150px;
+            max-width: 120px;
             display: block;
-            margin: 0 auto 20px auto;
+            margin: 0 auto 15px auto;
         }
         .summary-container {
             background-color: #fff;
             border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 15px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
         }
         .box {
             border: 1px solid #dee2e6;
             border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
+            padding: 10px;
+            margin-bottom: 15px;
             background-color: #f1f3f5;
         }
         .box h4 {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         .yes {
             color: blue;
@@ -40,25 +40,27 @@
             color: red;
             font-weight: bold;
         }
-        .dr-box .col-5.text-end {
-            text-align: left; 
+        .dr-row {
+            padding: 6px 10px;
         }
-        .indicator {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            display: inline-block;
+        .dr-row div {
+            padding: 4px 5px;
         }
-
-        .dr-box .row {
-            padding-left: 10px;
-            padding-right: 10px;
+        .fw-header {
+            font-weight: bold;
+            color: #555;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 4px;
+            margin-bottom: 4px;
         }
-
-        .dr-box .col-3,
-        .dr-box .col-4,
-        .dr-box .col-2 {
-            padding: 4px 10px;
+        @media (max-width: 576px) {
+            .dr-row {
+                flex-direction: column;
+                text-align: left;
+            }
+            .dr-row div {
+                margin-bottom: 4px;
+            }
         }
     </style>
 </head>
@@ -70,8 +72,8 @@
 <div class="summary-container">
 
     <!-- Top image inside div -->
-    <div class="text-center mb-3">
-        <img src="PKUMap.png" class="rounded-circle" width="100" alt="PKU Map">
+    <div class="text-center mb-2">
+        <img src="PKUMap.png" class="rounded-circle" width="80" alt="PKU Map">
     </div>
 
     <!-- "To Do" Box -->
@@ -87,207 +89,139 @@
         </ul>
     </div>
 
-    <!-- Collapsible Dr View -->
-    <!-- Header Row -->
-    <div class="row fw-bold mb-2 text-muted">
-        <div class="col-3">Test</div>
-        <div class="col-2 text-center">Indicator</div>
-        <div class="col-4">Symptoms</div>
-        <div class="col-3">Consent</div>
+    <!-- Doctor View Toggle -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h4 class="mb-0">Doctor View</h4>
+        <button
+            class="btn btn-outline-primary btn-sm"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#doctorView"
+            aria-expanded="true"
+            aria-controls="doctorView">
+            Toggle
+        </button>
     </div>
 
-    <!-- Blood Test -->
-    <div class="row py-2 align-items-center">
-        <div class="col-3">Blood Test</div>
-        <div class="col-2 text-center">
-            <span id="bloodIndicator" class="indicator"></span>
+    <!-- Doctor View Content (OPEN by default) -->
+    <div class="collapse show" id="doctorView">
+
+        <!-- Header Row -->
+        <div class="d-flex fw-header mb-1">
+            <div class="col-4">Test</div>
+            <div class="col-5">Symptoms & Duration</div>
+            <div class="col-3">Consent</div>
         </div>
-        <div class="col-4" id="bloodSymptoms"></div>
-        <div class="col-3" id="btConsent"></div>
-    </div>
 
-    <!-- Urine Test -->
-    <div class="row py-2 align-items-center">
-        <div class="col-3">Urine Test</div>
-        <div class="col-2 text-center">
-            <span id="urineIndicator" class="indicator"></span>
+        <!-- Blood Test -->
+        <div class="d-flex dr-row align-items-center">
+            <div class="col-4">Blood Test</div>
+            <div class="col-5" id="bloodSymptoms"></div>
+            <div class="col-3" id="btConsent"></div>
         </div>
-        <div class="col-4" id="urineSymptoms"></div>
-        <div class="col-3" id="utConsent"></div>
-    </div>
 
-    <!-- Rapid Blood Sugar Test -->
-    <div class="row py-2 align-items-center">
-        <div class="col-3">Rapid Blood Sugar Test</div>
-        <div class="col-2 text-center">
-            <span id="rbstIndicator" class="indicator"></span>
+        <!-- Urine Test -->
+        <div class="d-flex dr-row align-items-center">
+            <div class="col-4">Urine Test</div>
+            <div class="col-5" id="urineSymptoms"></div>
+            <div class="col-3" id="utConsent"></div>
         </div>
-        <div class="col-4" id="rbstSymptoms"></div>
-        <div class="col-3" id="rbstConsent"></div>
-    </div>
 
-    <!-- X-Ray -->
-    <div class="row py-2 align-items-center">
-        <div class="col-3">X-Ray</div>
-        <div class="col-2 text-center">
-            <span id="xRayIndicator" class="indicator"></span>
+        <!-- Rapid Blood Sugar Test -->
+        <div class="d-flex dr-row align-items-center">
+            <div class="col-4">Rapid Blood Sugar Test</div>
+            <div class="col-5" id="rbstSymptoms"></div>
+            <div class="col-3" id="rbstConsent"></div>
         </div>
-        <div class="col-4" id="xRaySymptoms"></div>
-        <div class="col-3" id="xrConsent"></div>
-    </div>
 
-
-        <!-- GDrive Link at the bottom -->
-        <div class="text-center mt-3">
-            <a id="gDriveLink" href="#" target="_blank" class="btn btn-link">View Patient Virtual Card</a>
+        <!-- X-Ray -->
+        <div class="d-flex dr-row align-items-center">
+            <div class="col-4">X-Ray</div>
+            <div class="col-5" id="xRaySymptoms"></div>
+            <div class="col-3" id="xrConsent"></div>
         </div>
+
+        <!-- Blood Pressure Test -->
+        <div class="d-flex dr-row align-items-center">
+            <div class="col-4">Blood Pressure Test</div>
+            <div class="col-5" id="bpSymptoms"></div>
+            <div class="col-3" id="bpConsent"></div>
+        </div>
+
     </div>
 
-
+    <!-- GDrive Link at the bottom -->
+    <div class="text-center mt-3">
+        <a id="gDriveLink" href="#" target="_blank" class="btn btn-link">View Patient Virtual Card</a>
+    </div>
 </div>
-
 
 <!-- Local Bootstrap JS Bundle -->
 <script src="bootstrap.bundle.min.js"></script>
 
 <script>
-    const params = new URLSearchParams(window.location.search);
+const params = new URLSearchParams(window.location.search);
 
-    function yesNo(value) {
-        return value === "1" ? "Yes" : "No";
+// Show or hide To Do items
+function toggleVisibility(paramKey, liId) {
+    const value = params.get(paramKey);
+    const li = document.getElementById(liId);
+    li.style.display = value === "1" ? "list-item" : "none";
+}
+
+["bloodTest", "urineTest", "rapidBloodSugarTest", "xRay"].forEach((key) => {
+    toggleVisibility(key, "li" + key.charAt(0).toUpperCase() + key.slice(1));
+});
+
+// Build symptoms with durations
+function buildSymptoms(symptomKeys) {
+    const labels = {
+        fever: "Fever",
+        cough: "Cough",
+        headache: "Headache",
+        urinaryHesitancy: "Urinary Hesitancy",
+        urinaryFrequency: "Urinary Frequency",
+        amenorrhea: "Amenorrhea"
+    };
+    const durationLabels = {
+        fever: "durationFever",
+        cough: "durationCough"
+    };
+
+    const found = symptomKeys
+        .filter(k => params.get(k) === "1")
+        .map(k => {
+            const durationKey = durationLabels[k];
+            const duration = durationKey ? params.get(durationKey) : null;
+            return duration ? `${labels[k]} (${duration} days)` : labels[k];
+        });
+
+    return found.length > 0 ? found.join(", ") : null;
+}
+
+// Update Doctor View
+function updateDrView(testKey, consentKey, symptomsId, consentId, symptomKeys) {
+    const consentValue = params.get(consentKey);
+    const symptomsEl = document.getElementById(symptomsId);
+    const consentEl = document.getElementById(consentId);
+
+    const symptomText = buildSymptoms(symptomKeys);
+
+    if (symptomText) {
+        symptomsEl.textContent = symptomText;
+        consentEl.textContent = (consentValue === "1") ? "Consent" : "No Consent";
+    } else {
+        symptomsEl.textContent = "No symptom";
+        consentEl.textContent = "-";
     }
+}
 
-    // Toggle To Do visibility
-    function toggleVisibility(paramKey, liId, spanId) {
-        const value = params.get(paramKey);
-        const li = document.getElementById(liId);
-        const span = document.getElementById(spanId);
-
-        if (value === "1") {
-            li.style.display = "list-item";
-        } else {
-            li.style.display = "none";
-        }
-    }
-
-    toggleVisibility("bloodTest", "liBloodTest", "bloodTest");
-    toggleVisibility("urineTest", "liUrineTest", "urineTest");
-    toggleVisibility("rapidBloodSugarTest", "liRbst", "rbst");
-    toggleVisibility("xRay", "liXRay", "xRay");
-
-    // Set Doctor View indicator and consent
-    function hasAnySymptom(keys) {
-        return keys.some(k => params.get(k) === "1");
-    }
-
-    function buildSymptoms(symptomKeys) {
-        const labels = {
-            fever: "Fever",
-            cough: "Cough",
-            headache: "Headache",
-            urinaryHesitancy: "Urinary Hesitancy",
-            urinaryFrequency: "Urinary Frequency",
-            amenorrhea: "Amenorrhea"
-        };
-
-        const found = symptomKeys
-            .filter(k => params.get(k) === "1")
-            .map(k => labels[k]);
-
-        return found.length > 0 ? found.join(", ") : "No symptom";
-    }
-
-    function updateDrView({
-        testKey,
-        consentKey,
-        indicatorId,
-        symptomsId,
-        consentId,
-        symptomKeys,
-        durationKey,
-        durationThreshold
-    }) {
-        const test = params.get(testKey) === "1";
-        const consentValue = params.get(consentKey) === "1";
-        const duration = parseInt(params.get(durationKey || ""), 10) || 0;
-
-        const indicator = document.getElementById(indicatorId);
-        const symptomsEl = document.getElementById(symptomsId);
-        const consentEl = document.getElementById(consentId);
-
-        const hasSymptom = hasAnySymptom(symptomKeys);
-
-        // Symptoms text
-        symptomsEl.textContent = buildSymptoms(symptomKeys);
-
-        // ----- INDICATOR LOGIC -----
-        let indicatorBlue = false;
-
-        if (test) {
-            // Duration-based tests (blood / x-ray)
-            if (durationKey) {
-                indicatorBlue = hasSymptom && duration >= durationThreshold;
-            }
-            // Symptom-driven tests (urine / rbst)
-            else {
-                indicatorBlue = hasSymptom;
-            }
-
-            // Consent override
-            if (!consentValue && hasSymptom) {
-                indicatorBlue = false;
-            }
-        }
-
-        indicator.style.backgroundColor = indicatorBlue ? "blue" : "red";
-
-        // ----- CONSENT LOGIC -----
-        if (indicatorBlue) {
-            consentEl.textContent = "Consent";
-        } else {
-            consentEl.textContent = hasSymptom ? "No Consent" : "-";
-        }
-    }
-
-    updateDrView({
-        testKey: "bloodTest",
-        consentKey: "btConsent",
-        indicatorId: "bloodIndicator",
-        symptomsId: "bloodSymptoms",
-        consentId: "btConsent",
-        symptomKeys: ["fever"],
-        durationKey: "durationFever",
-        durationThreshold: 3
-    });
-
-    updateDrView({
-        testKey: "urineTest",
-        consentKey: "utConsent",
-        indicatorId: "urineIndicator",
-        symptomsId: "urineSymptoms",
-        consentId: "utConsent",
-        symptomKeys: ["urinaryHesitancy", "amenorrhea"]
-    });
-
-    updateDrView({
-        testKey: "rapidBloodSugarTest",
-        consentKey: "rbstConsent",
-        indicatorId: "rbstIndicator",
-        symptomsId: "rbstSymptoms",
-        consentId: "rbstConsent",
-        symptomKeys: ["urinaryFrequency"]
-    });
-
-    updateDrView({
-        testKey: "xRay",
-        consentKey: "xrConsent",
-        indicatorId: "xRayIndicator",
-        symptomsId: "xRaySymptoms",
-        consentId: "xrConsent",
-        symptomKeys: ["cough"],
-        durationKey: "durationCough",
-        durationThreshold: 21
-    });
+// Update all tests
+updateDrView("bloodTest", "btConsent", "bloodSymptoms", "btConsent", ["fever"]);
+updateDrView("urineTest", "utConsent", "urineSymptoms", "utConsent", ["urinaryHesitancy", "amenorrhea"]);
+updateDrView("rapidBloodSugarTest", "rbstConsent", "rbstSymptoms", "rbstConsent", ["urinaryFrequency"]);
+updateDrView("xRay", "xrConsent", "xRaySymptoms", "xrConsent", ["cough"]);
+updateDrView("bloodPressureTest", "bpConsent", "bpSymptoms", "bpConsent", ["headache"]);
 </script>
 
 </body>
