@@ -96,51 +96,64 @@
             </ul>
         </div>
 
-        <!-- Doctor View Content (OPEN by default) -->
-        <div class="collapse show" id="doctorView">
+        <div class="box">
 
-            <!-- Header Row -->
-            <div class="row fw-bold mb-2 text-muted">
-                <div class="col-4">Test</div>
-                <div class="col-5">Symptoms</div>
-                <div class="col-3">Consent</div>
+            <!-- Doctor View Button -->
+            <button class="btn btn-outline-primary text-start mb-2"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#drView"
+                    aria-expanded="true"
+                    aria-controls="drView">
+                Doctor View
+            </button>
+
+            <!-- Collapsible Doctor View -->
+            <div class="collapse show" id="drView">
+
+                <!-- Header Row -->
+                <div class="row fw-bold mb-2 text-muted px-2">
+                    <div class="col-4">Test</div>
+                    <div class="col-5">Symptoms</div>
+                    <div class="col-3">Consent</div>
+                </div>
+
+                <!-- Blood Test -->
+                <div class="row py-2 align-items-center px-2">
+                    <div class="col-4">Blood Test</div>
+                    <div class="col-5" id="bloodSymptoms"></div>
+                    <div class="col-3" id="btConsent"></div>
+                </div>
+
+                <!-- Urine Test -->
+                <div class="row py-2 align-items-center px-2">
+                    <div class="col-4">Urine Test</div>
+                    <div class="col-5" id="urineSymptoms"></div>
+                    <div class="col-3" id="utConsent"></div>
+                </div>
+
+                <!-- Rapid Blood Sugar Test -->
+                <div class="row py-2 align-items-center px-2">
+                    <div class="col-4">Rapid Blood Sugar Test</div>
+                    <div class="col-5" id="rbstSymptoms"></div>
+                    <div class="col-3" id="rbstConsent"></div>
+                </div>
+
+                <!-- X-Ray -->
+                <div class="row py-2 align-items-center px-2">
+                    <div class="col-4">X-Ray</div>
+                    <div class="col-5" id="xRaySymptoms"></div>
+                    <div class="col-3" id="xrConsent"></div>
+                </div>
+
+                <!-- Blood Pressure Test -->
+                <div class="row py-2 align-items-center px-2">
+                    <div class="col-4">Blood Pressure Test</div>
+                    <div class="col-5" id="bpSymptoms"></div>
+                    <div class="col-3" id="bpConsent"></div>
+                </div>
+
             </div>
-
-            <!-- Blood Test -->
-            <div class="row py-2 align-items-center">
-                <div class="col-4">Blood Test</div>
-                <div class="col-5" id="bloodSymptoms"></div>
-                <div class="col-3" id="btConsent"></div>
-            </div>
-
-            <!-- Urine Test -->
-            <div class="row py-2 align-items-center">
-                <div class="col-4">Urine Test</div>
-                <div class="col-5" id="urineSymptoms"></div>
-                <div class="col-3" id="utConsent"></div>
-            </div>
-
-            <!-- Rapid Blood Sugar Test -->
-            <div class="row py-2 align-items-center">
-                <div class="col-4">Rapid Blood Sugar Test</div>
-                <div class="col-5" id="rbstSymptoms"></div>
-                <div class="col-3" id="rbstConsent"></div>
-            </div>
-
-            <!-- X-Ray -->
-            <div class="row py-2 align-items-center">
-                <div class="col-4">X-Ray</div>
-                <div class="col-5" id="xRaySymptoms"></div>
-                <div class="col-3" id="xrConsent"></div>
-            </div>
-
-            <!-- Blood Pressure Test -->
-            <div class="row py-2 align-items-center">
-                <div class="col-4">Blood Pressure Test</div>
-                <div class="col-5" id="bpSymptoms"></div>
-                <div class="col-3" id="bpConsent"></div>
-            </div>
-
         </div>
 
 
@@ -196,7 +209,7 @@
             return found.length > 0 ? found.join(", ") : null;
         }
 
-        // Update Doctor View row with duration-based consent for fever and cough
+        // Update Doctor View row with correct consent logic
         function updateDrView(testKey, consentKey, symptomsId, consentId, symptomKeys) {
             const consentValue = params.get(consentKey);
             const symptomsEl = document.getElementById(symptomsId);
@@ -204,16 +217,25 @@
 
             const symptomText = buildSymptoms(symptomKeys);
 
-            // Determine consent for fever/cough based on duration
             let finalConsent = "-";
+
             if (symptomText) {
+                // Fever consent
                 if (testKey === "bloodTest" && symptomKeys.includes("fever")) {
                     const dur = parseInt(params.get("durationFever")) || 0;
-                    finalConsent = dur >= 3 ? "Consent" : "No Consent";
-                } else if (testKey === "xRay" && symptomKeys.includes("cough")) {
+                    finalConsent = dur >= 3 ? "Consent" : "-";
+                }
+                // Cough consent
+                else if (testKey === "xRay" && symptomKeys.includes("cough")) {
                     const dur = parseInt(params.get("durationCough")) || 0;
-                    finalConsent = dur >= 21 ? "Consent" : "No Consent";
-                } else {
+                    finalConsent = dur >= 21 ? "Consent" : "-";
+                }
+                // Headache → always "-"
+                else if (testKey === "bloodPressureTest" && symptomKeys.includes("headache")) {
+                    finalConsent = "-";
+                }
+                // Other tests → normal consent boolean
+                else {
                     finalConsent = (consentValue === "1") ? "Consent" : "No Consent";
                 }
             }
@@ -222,12 +244,12 @@
             consentEl.textContent = finalConsent;
         }
 
-        // Apply to each test
+        // Apply for each test
         updateDrView("bloodTest", "btConsent", "bloodSymptoms", "btConsent", ["fever"]);
         updateDrView("urineTest", "utConsent", "urineSymptoms", "utConsent", ["urinaryHesitancy","amenorrhea"]);
         updateDrView("rapidBloodSugarTest", "rbstConsent", "rbstSymptoms", "rbstConsent", ["urinaryFrequency"]);
         updateDrView("xRay", "xrConsent", "xRaySymptoms", "xrConsent", ["cough"]);
         updateDrView("bloodPressureTest", "bpConsent", "bpSymptoms", "bpConsent", ["headache"]);
-    </script>
+        </script>
     </body>
 </html>
