@@ -87,7 +87,7 @@
 
         <!-- "To Do" Box -->
         <div class="box">
-            <h4>To Do</h4>
+            <h4>Patient's Tasks</h4>
             <ul class="list-group">
                 <li id="liBloodTest" class="list-group-item">Blood Test (Lab Sample)</li>
                 <li id="liUrineTest" class="list-group-item">Urine Test (Lab Sample)</li>
@@ -116,44 +116,60 @@
 
                 <!-- Header Row -->
                 <div class="row fw-bold mb-2 text-muted px-2">
-                    <div class="col-4">Test</div>
+                    <div class="col-3">Medical Test</div>
+                    <div class="col-1 text-center"></div>
                     <div class="col-5">Symptoms</div>
                     <div class="col-3">Consent</div>
                 </div>
 
                 <!-- Blood Test -->
                 <div class="row py-2 align-items-center" id="bloodRow">
-                    <div class="col-4">Blood Test</div>
+                    <div class="col-3">Blood Test</div>
+                    <div class="col-1 text-center">
+                        <span id="bloodIndicator" class="indicator"></span>
+                    </div>
                     <div class="col-5" id="bloodSymptoms"></div>
                     <div class="col-3" id="btConsent"></div>
                 </div>
 
                 <!-- Urine Test -->
                 <div class="row py-2 align-items-center" id="urineRow">
-                    <div class="col-4">Urine Test</div>
+                    <div class="col-3">Urine Test</div>
+                    <div class="col-1 text-center">
+                        <span id="urineIndicator" class="indicator"></span>
+                    </div>
                     <div class="col-5" id="urineSymptoms"></div>
                     <div class="col-3" id="utConsent"></div>
                 </div>
 
                 <!-- Rapid Blood Sugar Test -->
                 <div class="row py-2 align-items-center" id="rbstRow">
-                    <div class="col-4">Rapid Blood Sugar Test</div>
+                    <div class="col-3">Rapid Blood Sugar Test</div>
+                    <div class="col-1 text-center">
+                        <span id="rbstIndicator" class="indicator"></span>
+                    </div>
                     <div class="col-5" id="rbstSymptoms"></div>
                     <div class="col-3" id="rbstConsent"></div>
                 </div>
 
                 <!-- X-Ray -->
                 <div class="row py-2 align-items-center" id="xRayRow">
-                    <div class="col-4">X-Ray</div>
+                    <div class="col-3">X-Ray</div>
+                    <div class="col-1 text-center">
+                        <span id="xRayIndicator" class="indicator"></span>
+                    </div>
                     <div class="col-5" id="xRaySymptoms"></div>
                     <div class="col-3" id="xrConsent"></div>
                 </div>
 
                 <!-- Blood Pressure Test -->
                 <div class="row py-2 align-items-center" id="bpRow">
-                    <div class="col-4">Blood Pressure Test</div>
+                    <div class="col-3">Blood Pressure Test</div>
+                    <div class="col-1 text-center">
+                        <span id="bpIndicator" class="indicator"></span>
+                    </div>
                     <div class="col-5" id="bpSymptoms"></div>
-                    <div class="col-3" id="bpConsent"></div>
+                    <!-- <div class="col-3" id="utConsent"></div> -->
                 </div>
 
             </div>
