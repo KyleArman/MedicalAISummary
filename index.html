@@ -206,9 +206,11 @@
         if (testValue === "1") {
             indicator.style.backgroundColor = "blue";
 
-            consent.textContent = consentValue === "1"
-                ? "Consent"
-                : "No Consent";
+            if (consentValue === "1") {
+                consent.textContent = "Consent";
+            } else {
+                consent.textContent = "No Consent";
+            }
         } else {
             indicator.style.backgroundColor = "red";
             consent.textContent = "-";
