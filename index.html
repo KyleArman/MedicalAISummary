@@ -2,58 +2,129 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Test Summary</title>
+    <title>Patient Summary</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+        .top-image {
+            max-width: 150px;
+            display: block;
+            margin: 0 auto 20px auto;
+        }
+        .summary-container {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .box {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #f1f3f5;
+        }
+        .box h4 {
+            margin-bottom: 15px;
+        }
+        .yes {
+            color: green;
+            font-weight: bold;
+        }
+        .no {
+            color: red;
+            font-weight: bold;
+        }
+        .dr-box .row {
+            align-items: center;
+        }
+        .dr-box .col-6 {
+            padding: 5px 10px;
+        }
+    </style>
 </head>
 <body>
 
-<h2>Requested Tests</h2>
-<ul>
-    <li>Blood Test: <span id="bloodTest"></span></li>
-    <li>Urine Test: <span id="urineTest"></span></li>
-    <li>Rapid Blood Sugar Test: <span id="rbst"></span></li>
-    <li>X-Ray: <span id="xray"></span></li>
-</ul>
+<!-- Top Image -->
+<img src="top_logo.png" class="top-image" alt="Hospital Logo">
 
-<h2>Consents</h2>
-<ul>
-    <li>Blood Test Consent: <span id="btConsent"></span></li>
-    <li>Urine Test Consent: <span id="utConsent"></span></li>
-    <li>Rapid Blood Sugar Test Consent: <span id="rbstConsent"></span></li>
-    <li>X-Ray Consent: <span id="xrConsent"></span></li>
-</ul>
+<div class="summary-container">
+
+    <!-- Top image inside div -->
+    <div class="text-center mb-3">
+        <img src="patient_avatar.png" class="rounded-circle" width="100" alt="Patient Image">
+    </div>
+
+    <!-- "To Do" Box -->
+    <div class="box">
+        <h4>To Do</h4>
+        <ul class="list-group">
+            <li class="list-group-item">Blood Test: <span id="bloodTest" class="value"></span></li>
+            <li class="list-group-item">Urine Test: <span id="urineTest" class="value"></span></li>
+            <li class="list-group-item">Rapid Blood Sugar Test: <span id="rbst" class="value"></span></li>
+            <li class="list-group-item">X-Ray: <span id="xRay" class="value"></span></li>
+        </ul>
+    </div>
+
+    <!-- Collapsible Dr View -->
+    <div class="box">
+        <h4>
+            <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#drView" aria-expanded="false" aria-controls="drView">
+                Doctor View: Tests & Consents
+            </button>
+        </h4>
+        <div class="collapse" id="drView">
+            <div class="dr-box">
+                <div class="row border-bottom py-2">
+                    <div class="col-6">Blood Test</div>
+                    <div class="col-6">Consent: <span id="btConsent" class="value"></span></div>
+                </div>
+                <div class="row border-bottom py-2">
+                    <div class="col-6">Urine Test</div>
+                    <div class="col-6">Consent: <span id="utConsent" class="value"></span></div>
+                </div>
+                <div class="row border-bottom py-2">
+                    <div class="col-6">Rapid Blood Sugar Test</div>
+                    <div class="col-6">Consent: <span id="rbstConsent" class="value"></span></div>
+                </div>
+                <div class="row border-bottom py-2">
+                    <div class="col-6">X-Ray</div>
+                    <div class="col-6">Consent: <span id="xrConsent" class="value"></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    const params = new URLSearchParams(window.location.search);
-
     function yesNo(value) {
-        return value === "1" ? "Yes" : "No";
+        if (value === "1") return '<span class="yes">Yes</span>';
+        if (value === "0") return '<span class="no">No</span>';
+        return '-';
     }
 
-    // Tests
-    document.getElementById("bloodTest").textContent =
-        yesNo(params.get("bloodTest"));
+    const params = new URLSearchParams(window.location.search);
 
-    document.getElementById("urineTest").textContent =
-        yesNo(params.get("urineTest"));
-
-    document.getElementById("rbst").textContent =
-        yesNo(params.get("rapidBloodSugarTest"));
-
-    document.getElementById("xray").textContent =
-        yesNo(params.get("xRay"));
+    // "To Do" tests
+    document.getElementById("bloodTest").innerHTML = yesNo(params.get("bloodTest"));
+    document.getElementById("urineTest").innerHTML = yesNo(params.get("urineTest"));
+    document.getElementById("rbst").innerHTML = yesNo(params.get("rapidBloodSugarTest"));
+    document.getElementById("xRay").innerHTML = yesNo(params.get("xRay"));
 
     // Consents
-    document.getElementById("btConsent").textContent =
-        yesNo(params.get("btConsent"));
-
-    document.getElementById("utConsent").textContent =
-        yesNo(params.get("utConsent"));
-
-    document.getElementById("rbstConsent").textContent =
-        yesNo(params.get("rbstConsent"));
-
-    document.getElementById("xrConsent").textContent =
-        yesNo(params.get("xrConsent"));
+    document.getElementById("btConsent").innerHTML = yesNo(params.get("btConsent"));
+    document.getElementById("utConsent").innerHTML = yesNo(params.get("utConsent"));
+    document.getElementById("rbstConsent").innerHTML = yesNo(params.get("rbstConsent"));
+    document.getElementById("xrConsent").innerHTML = yesNo(params.get("xrConsent"));
 </script>
 
 </body>
