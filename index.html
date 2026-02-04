@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Patient Summary</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Local Bootstrap CSS -->
+    <link href="bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -33,7 +33,7 @@
             margin-bottom: 15px;
         }
         .yes {
-            color: green;
+            color: blue;
             font-weight: bold;
         }
         .no {
@@ -43,88 +43,149 @@
         .dr-box .row {
             align-items: center;
         }
-        .dr-box .col-6 {
-            padding: 5px 10px;
+        .dr-box .col-5,
+        .dr-box .col-2 {
+            padding: 0 15px;  
+        }
+
+        .dr-box .col-5.text-end {
+            text-align: left; 
+        }
+        .indicator {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: gray;
         }
     </style>
 </head>
 <body>
 
 <!-- Top Image -->
-<img src="top_logo.png" class="top-image" alt="Hospital Logo">
+<img src="top_logo.png" class="top-image" alt="Patient QR Code">
 
 <div class="summary-container">
 
     <!-- Top image inside div -->
     <div class="text-center mb-3">
-        <img src="patient_avatar.png" class="rounded-circle" width="100" alt="Patient Image">
+        <img src="PKUMap.png" class="rounded-circle" width="100" alt="PKU Map">
     </div>
 
     <!-- "To Do" Box -->
     <div class="box">
         <h4>To Do</h4>
         <ul class="list-group">
-            <li class="list-group-item">Blood Test: <span id="bloodTest" class="value"></span></li>
-            <li class="list-group-item">Urine Test: <span id="urineTest" class="value"></span></li>
-            <li class="list-group-item">Rapid Blood Sugar Test: <span id="rbst" class="value"></span></li>
-            <li class="list-group-item">X-Ray: <span id="xRay" class="value"></span></li>
+            <li id="liBloodTest" class="list-group-item">Blood Test: <span id="bloodTest" class="value"></span></li>
+            <li id="liUrineTest" class="list-group-item">Urine Test: <span id="urineTest" class="value"></span></li>
+            <li id="liRbst" class="list-group-item">Rapid Blood Sugar Test: <span id="rbst" class="value"></span></li>
+            <li id="liXRay" class="list-group-item">X-Ray: <span id="xRay" class="value"></span></li>
+            <li class="list-group-item">See the Doctor</li>
+            <li class="list-group-item">Collect Prescribed Medicine at the Pharmacy</li>
         </ul>
     </div>
 
     <!-- Collapsible Dr View -->
     <div class="box">
         <h4>
-            <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#drView" aria-expanded="false" aria-controls="drView">
-                Doctor View: Tests & Consents
+            <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#drView" aria-expanded="true" aria-controls="drView">
+                Doctor View
             </button>
         </h4>
-        <div class="collapse" id="drView">
+        <div class="collapse show" id="drView">
             <div class="dr-box">
-                <div class="row border-bottom py-2">
-                    <div class="col-6">Blood Test</div>
-                    <div class="col-6">Consent: <span id="btConsent" class="value"></span></div>
+                <!-- Blood Test -->
+                <div class="row border-bottom py-2 align-items-center">
+                    <div class="col-5">Blood Test</div>
+                    <div class="col-2 text-center"><span id="bloodIndicator" class="indicator"></span></div>
+                    <div class="col-5" id="btConsent"></div>
                 </div>
-                <div class="row border-bottom py-2">
-                    <div class="col-6">Urine Test</div>
-                    <div class="col-6">Consent: <span id="utConsent" class="value"></span></div>
+                <!-- Urine Test -->
+                <div class="row border-bottom py-2 align-items-center">
+                    <div class="col-5">Urine Test</div>
+                    <div class="col-2 text-center"><span id="urineIndicator" class="indicator"></span></div>
+                    <div class="col-5" id="utConsent"></div>
                 </div>
-                <div class="row border-bottom py-2">
-                    <div class="col-6">Rapid Blood Sugar Test</div>
-                    <div class="col-6">Consent: <span id="rbstConsent" class="value"></span></div>
+                <!-- Rapid Blood Sugar Test -->
+                <div class="row border-bottom py-2 align-items-center">
+                    <div class="col-5">Rapid Blood Sugar Test</div>
+                    <div class="col-2 text-center"><span id="rbstIndicator" class="indicator"></span></div>
+                    <div class="col-5" id="rbstConsent"></div>
                 </div>
-                <div class="row border-bottom py-2">
-                    <div class="col-6">X-Ray</div>
-                    <div class="col-6">Consent: <span id="xrConsent" class="value"></span></div>
+                <!-- X-Ray -->
+                <div class="row border-bottom py-2 align-items-center">
+                    <div class="col-5">X-Ray</div>
+                    <div class="col-2 text-center"><span id="xRayIndicator" class="indicator"></span></div>
+                    <div class="col-5" id="xrConsent"></div>
                 </div>
             </div>
         </div>
+
+        <!-- GDrive Link at the bottom -->
+    <div class="text-center mt-3">
+        <a id="gDriveLink" href="#" target="_blank" class="btn btn-link">View Patient Virtual Card</a>
     </div>
 
 </div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Local Bootstrap JS Bundle -->
+<script src="bootstrap.bundle.min.js"></script>
 
 <script>
-    function yesNo(value) {
-        if (value === "1") return '<span class="yes">Yes</span>';
-        if (value === "0") return '<span class="no">No</span>';
-        return '-';
-    }
-
     const params = new URLSearchParams(window.location.search);
 
-    // "To Do" tests
-    document.getElementById("bloodTest").innerHTML = yesNo(params.get("bloodTest"));
-    document.getElementById("urineTest").innerHTML = yesNo(params.get("urineTest"));
-    document.getElementById("rbst").innerHTML = yesNo(params.get("rapidBloodSugarTest"));
-    document.getElementById("xRay").innerHTML = yesNo(params.get("xRay"));
+    function yesNo(value) {
+        return value === "1" ? "Yes" : "No";
+    }
 
-    // Consents
-    document.getElementById("btConsent").innerHTML = yesNo(params.get("btConsent"));
-    document.getElementById("utConsent").innerHTML = yesNo(params.get("utConsent"));
-    document.getElementById("rbstConsent").innerHTML = yesNo(params.get("rbstConsent"));
-    document.getElementById("xrConsent").innerHTML = yesNo(params.get("xrConsent"));
+    // Toggle To Do visibility
+    function toggleVisibility(paramKey, liId, spanId) {
+        const value = params.get(paramKey);
+        const li = document.getElementById(liId);
+        const span = document.getElementById(spanId);
+
+        if (value === "1") {
+            li.style.display = "list-item";
+            span.textContent = yesNo(value);
+        } else {
+            li.style.display = "none";
+        }
+    }
+
+    toggleVisibility("bloodTest", "liBloodTest", "bloodTest");
+    toggleVisibility("urineTest", "liUrineTest", "urineTest");
+    toggleVisibility("rapidBloodSugarTest", "liRbst", "rbst");
+    toggleVisibility("xRay", "liXRay", "xRay");
+
+    // Set Doctor View indicator and consent
+    function updateDrView(testKey, consentKey, indicatorId, displayId) {
+    const testValue = params.get(testKey);       // "1" if symptom/test present, "0" if not
+    const consentValue = params.get(consentKey); // "1" if consent given, "0" if not
+
+    const indicator = document.getElementById(indicatorId);
+    const displaySpan = document.getElementById(displayId);
+
+    if (testValue === "1") {
+        // Test/symptom present
+        indicator.style.backgroundColor = "blue"; // true = blue
+        if (consentValue === "1") {
+            displaySpan.textContent = "Consent";
+        } else {
+            displaySpan.textContent = "No Consent";
+        }
+    } else {
+        // Test/symptom not present
+        indicator.style.backgroundColor = "red";  // false = red
+        displaySpan.textContent = "No Symptom";
+    }
+}
+
+    // Apply to each test
+    updateDrView("bloodTest", "btConsent", "bloodIndicator", "btConsent");
+    updateDrView("urineTest", "utConsent", "urineIndicator", "utConsent");
+    updateDrView("rapidBloodSugarTest", "rbstConsent", "rbstIndicator", "rbstConsent");
+    updateDrView("xRay", "xrConsent", "xRayIndicator", "xrConsent");
 </script>
 
 </body>
