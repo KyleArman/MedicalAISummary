@@ -73,6 +73,19 @@
                 max-width: 75%; /* ensures it scales down on small screens */
                 height: auto;    /* keeps aspect ratio */
             }
+
+            .indicator {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                display: inline-block;
+            }
+            .indicator.blue {
+                background-color: #0d6efd; /* Bootstrap primary */
+            }
+            .indicator.red {
+                background-color: #dc3545; /* Bootstrap danger */
+            }
         </style>
     </head>
     <body>
@@ -229,8 +242,9 @@
         }
 
         // Update Doctor View row with correct consent logic
-        function updateDrView(testKey, consentKey, rowId, symptomsId, consentId, symptomKeys) {
+        function updateDrView(testKey, consentKey, rowId, indicatorId, symptomsId, consentId, symptomKeys) {
             const row = document.getElementById(rowId);
+            const indicator = document.getElementById(indicatorId);
             const symptomsEl = document.getElementById(symptomsId);
             const consentEl = document.getElementById(consentId);
 
@@ -247,12 +261,12 @@
 
             let finalConsent = "-";
 
-            // Fever rule
+            // Fever → ≥3 days
             if (testKey === "bloodTest") {
                 const d = parseInt(params.get("durationFever")) || 0;
                 finalConsent = d >= 3 ? "Consent" : "-";
             }
-            // Cough rule
+            // Cough → ≥21 days
             else if (testKey === "xRay") {
                 const d = parseInt(params.get("durationCough")) || 0;
                 finalConsent = d >= 21 ? "Consent" : "-";
@@ -261,12 +275,15 @@
             else if (testKey === "bloodPressureTest") {
                 finalConsent = "-";
             }
-            // Other tests
+            // Other tests → consent boolean
             else {
                 finalConsent = (consentValue === "1") ? "Consent" : "No Consent";
             }
 
             consentEl.textContent = finalConsent;
+
+            // 🔵 / 🔴 Indicator logic
+            indicator.className = "indicator " + (finalConsent === "Consent" ? "blue" : "red");
         }
 
         // Apply for each test
@@ -281,6 +298,6 @@
         updateDrView("xRay", "xrConsent", "xRayRow", "xRaySymptoms", "xrConsent", ["cough"]);
 
         updateDrView("bloodPressureTest", "bpConsent", "bpRow", "bpSymptoms", "bpConsent", ["headache"]);
-        </script>
+    </script>
     </body>
 </html>
