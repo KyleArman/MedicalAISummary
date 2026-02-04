@@ -68,18 +68,21 @@
                 .dr-row { font-size: 0.85rem; }
                 .col-test, .col-symptom, .col-consent { min-width: 100%; flex: 100%; margin-bottom: 4px; }
             }
+
+            .original-size {
+                max-width: 75%; /* ensures it scales down on small screens */
+                height: auto;    /* keeps aspect ratio */
+            }
         </style>
     </head>
     <body>
-
-    <!-- Top Image -->
-    <img src="top_logo.png" class="top-image" alt="Patient QR Code">
 
     <div class="summary-container">
 
         <!-- Top image inside div -->
         <div class="text-center mb-3">
-            <img src="PKUMap.png" class="rounded-circle" width="100" alt="PKU Map">
+            <h4>UTM Health Center Map</h4>
+            <img src="PKUMap.png" class="original-size" alt="PKU Map">
         </div>
 
         <!-- "To Do" Box -->
@@ -89,8 +92,8 @@
                 <li id="liBloodTest" class="list-group-item">Blood Test (Lab Sample)</li>
                 <li id="liUrineTest" class="list-group-item">Urine Test (Lab Sample)</li>
                 <li id="liRbst" class="list-group-item">Rapid Blood Sugar Test (Lab Sample)</li>
-                <li id="liXRay" class="list-group-item">X-Ray</li>
-                <li id="liBPTest" class="list-group-item">Blood Pressure Test</li>
+                <li id="liXRay" class="list-group-item">X-Ray (Diagnostic Lab)</li>
+                <li id="liBPTest" class="list-group-item">Blood Pressure Test (Doctor's Room)</li>
                 <li class="list-group-item">See the Doctor</li>
                 <li class="list-group-item">Collect Prescribed Medicine at the Pharmacy</li>
             </ul>
