@@ -122,35 +122,35 @@
                 </div>
 
                 <!-- Blood Test -->
-                <div class="row py-2 align-items-center px-2">
+                <div class="row py-2 align-items-center px-2 id="bloodRow">
                     <div class="col-4">Blood Test</div>
                     <div class="col-5" id="bloodSymptoms"></div>
                     <div class="col-3" id="btConsent"></div>
                 </div>
 
                 <!-- Urine Test -->
-                <div class="row py-2 align-items-center px-2">
+                <div class="row py-2 align-items-center px-2 id="urineRow">
                     <div class="col-4">Urine Test</div>
                     <div class="col-5" id="urineSymptoms"></div>
                     <div class="col-3" id="utConsent"></div>
                 </div>
 
                 <!-- Rapid Blood Sugar Test -->
-                <div class="row py-2 align-items-center px-2">
+                <div class="row py-2 align-items-center px-2 id="rbstRow">
                     <div class="col-4">Rapid Blood Sugar Test</div>
                     <div class="col-5" id="rbstSymptoms"></div>
                     <div class="col-3" id="rbstConsent"></div>
                 </div>
 
                 <!-- X-Ray -->
-                <div class="row py-2 align-items-center px-2">
+                <div class="row py-2 align-items-center px-2 id="xRayRow">
                     <div class="col-4">X-Ray</div>
                     <div class="col-5" id="xRaySymptoms"></div>
                     <div class="col-3" id="xrConsent"></div>
                 </div>
 
                 <!-- Blood Pressure Test -->
-                <div class="row py-2 align-items-center px-2">
+                <div class="row py-2 align-items-center px-2 id="bpRow">
                     <div class="col-4">Blood Pressure Test</div>
                     <div class="col-5" id="bpSymptoms"></div>
                     <div class="col-3" id="bpConsent"></div>
@@ -199,60 +199,72 @@
                 .filter(k => params.get(k) === "1")
                 .map(k => {
                     if (k === "fever") {
-                        const dur = parseInt(params.get("durationFever")) || 0;
-                        return dur ? `Fever (${dur} days)` : "Fever";
+                        const d = parseInt(params.get("durationFever")) || 0;
+                        return `Fever (${d} days)`;
                     }
                     if (k === "cough") {
-                        const dur = parseInt(params.get("durationCough")) || 0;
-                        return dur ? `Cough (${dur} days)` : "Cough";
+                        const d = parseInt(params.get("durationCough")) || 0;
+                        return `Cough (${d} days)`;
                     }
                     return labels[k];
                 });
 
-            return found.length > 0 ? found.join(", ") : null;
+            return found.length ? found.join(", ") : null;
         }
 
         // Update Doctor View row with correct consent logic
-        function updateDrView(testKey, consentKey, symptomsId, consentId, symptomKeys) {
-            const consentValue = params.get(consentKey);
+        function updateDrView(testKey, consentKey, rowId, symptomsId, consentId, symptomKeys) {
+            const row = document.getElementById(rowId);
             const symptomsEl = document.getElementById(symptomsId);
             const consentEl = document.getElementById(consentId);
 
+            const consentValue = params.get(consentKey);
             const symptomText = buildSymptoms(symptomKeys);
+
+            if (!symptomText) {
+                row.style.display = "none";
+                return;
+            }
+
+            row.style.display = "flex";
+            symptomsEl.textContent = symptomText;
 
             let finalConsent = "-";
 
-            if (symptomText) {
-                // Fever consent
-                if (testKey === "bloodTest" && symptomKeys.includes("fever")) {
-                    const dur = parseInt(params.get("durationFever")) || 0;
-                    finalConsent = dur >= 3 ? "Consent" : "-";
-                }
-                // Cough consent
-                else if (testKey === "xRay" && symptomKeys.includes("cough")) {
-                    const dur = parseInt(params.get("durationCough")) || 0;
-                    finalConsent = dur >= 21 ? "Consent" : "-";
-                }
-                // Headache → always "-"
-                else if (testKey === "bloodPressureTest" && symptomKeys.includes("headache")) {
-                    finalConsent = "-";
-                }
-                // Other tests → normal consent boolean
-                else {
-                    finalConsent = (consentValue === "1") ? "Consent" : "No Consent";
-                }
+            // Fever rule
+            if (testKey === "bloodTest") {
+                const d = parseInt(params.get("durationFever")) || 0;
+                finalConsent = d >= 3 ? "Consent" : "-";
+            }
+            // Cough rule
+            else if (testKey === "xRay") {
+                const d = parseInt(params.get("durationCough")) || 0;
+                finalConsent = d >= 21 ? "Consent" : "-";
+            }
+            // Headache → always "-"
+            else if (testKey === "bloodPressureTest") {
+                finalConsent = "-";
+            }
+            // Other tests
+            else {
+                finalConsent = (consentValue === "1") ? "Consent" : "No Consent";
             }
 
-            symptomsEl.textContent = symptomText || "No symptom";
             consentEl.textContent = finalConsent;
         }
 
         // Apply for each test
-        updateDrView("bloodTest", "btConsent", "bloodSymptoms", "btConsent", ["fever"]);
-        updateDrView("urineTest", "utConsent", "urineSymptoms", "utConsent", ["urinaryHesitancy","amenorrhea"]);
-        updateDrView("rapidBloodSugarTest", "rbstConsent", "rbstSymptoms", "rbstConsent", ["urinaryFrequency"]);
-        updateDrView("xRay", "xrConsent", "xRaySymptoms", "xrConsent", ["cough"]);
-        updateDrView("bloodPressureTest", "bpConsent", "bpSymptoms", "bpConsent", ["headache"]);
+        updateDrView("bloodTest", "btConsent", "bloodRow", "bloodSymptoms", "btConsent", ["fever"]);
+
+        updateDrView("urineTest", "utConsent", "urineRow", "urineSymptoms", "utConsent",
+            ["urinaryHesitancy", "amenorrhea"]);
+
+        updateDrView("rapidBloodSugarTest", "rbstConsent", "rbstRow", "rbstSymptoms", "rbstConsent",
+            ["urinaryFrequency"]);
+
+        updateDrView("xRay", "xrConsent", "xRayRow", "xRaySymptoms", "xrConsent", ["cough"]);
+
+        updateDrView("bloodPressureTest", "bpConsent", "bpRow", "bpSymptoms", "bpConsent", ["headache"]);
         </script>
     </body>
 </html>
