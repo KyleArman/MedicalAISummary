@@ -40,23 +40,25 @@
             color: red;
             font-weight: bold;
         }
-        .dr-box .row {
-            align-items: center;
-        }
-        .dr-box .col-5,
-        .dr-box .col-2 {
-            padding: 0 15px;  
-        }
-
         .dr-box .col-5.text-end {
             text-align: left; 
         }
         .indicator {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
-            background-color: gray;
+            display: inline-block;
+        }
+
+        .dr-box .row {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .dr-box .col-3,
+        .dr-box .col-4,
+        .dr-box .col-2 {
+            padding: 4px 10px;
         }
     </style>
 </head>
@@ -76,55 +78,71 @@
     <div class="box">
         <h4>To Do</h4>
         <ul class="list-group">
-            <li id="liBloodTest" class="list-group-item">Blood Test: <span id="bloodTest" class="value"></span></li>
-            <li id="liUrineTest" class="list-group-item">Urine Test: <span id="urineTest" class="value"></span></li>
-            <li id="liRbst" class="list-group-item">Rapid Blood Sugar Test: <span id="rbst" class="value"></span></li>
-            <li id="liXRay" class="list-group-item">X-Ray: <span id="xRay" class="value"></span></li>
+            <li id="liBloodTest" class="list-group-item">Blood Test (Lab Sample) <span id="bloodTest" class="value"></span></li>
+            <li id="liUrineTest" class="list-group-item">Urine Test (Lab Sample) <span id="urineTest" class="value"></span></li>
+            <li id="liRbst" class="list-group-item">Rapid Blood Sugar Test (Lab Sample) <span id="rbst" class="value"></span></li>
+            <li id="liXRay" class="list-group-item">X-Ray <span id="xRay" class="value"></span></li>
             <li class="list-group-item">See the Doctor</li>
             <li class="list-group-item">Collect Prescribed Medicine at the Pharmacy</li>
         </ul>
     </div>
 
     <!-- Collapsible Dr View -->
-    <div class="box">
-        <h4>
-            <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#drView" aria-expanded="true" aria-controls="drView">
-                Doctor View
-            </button>
-        </h4>
-        <div class="collapse show" id="drView">
-            <div class="dr-box">
-                <!-- Blood Test -->
-                <div class="row border-bottom py-2 align-items-center">
-                    <div class="col-5">Blood Test</div>
-                    <div class="col-2 text-center"><span id="bloodIndicator" class="indicator"></span></div>
-                    <div class="col-5" id="btConsent"></div>
-                </div>
-                <!-- Urine Test -->
-                <div class="row border-bottom py-2 align-items-center">
-                    <div class="col-5">Urine Test</div>
-                    <div class="col-2 text-center"><span id="urineIndicator" class="indicator"></span></div>
-                    <div class="col-5" id="utConsent"></div>
-                </div>
-                <!-- Rapid Blood Sugar Test -->
-                <div class="row border-bottom py-2 align-items-center">
-                    <div class="col-5">Rapid Blood Sugar Test</div>
-                    <div class="col-2 text-center"><span id="rbstIndicator" class="indicator"></span></div>
-                    <div class="col-5" id="rbstConsent"></div>
-                </div>
-                <!-- X-Ray -->
-                <div class="row border-bottom py-2 align-items-center">
-                    <div class="col-5">X-Ray</div>
-                    <div class="col-2 text-center"><span id="xRayIndicator" class="indicator"></span></div>
-                    <div class="col-5" id="xrConsent"></div>
-                </div>
-            </div>
+    <!-- Header Row -->
+    <div class="row fw-bold mb-2 text-muted">
+        <div class="col-3">Test</div>
+        <div class="col-2 text-center">Indicator</div>
+        <div class="col-4">Symptoms</div>
+        <div class="col-3">Consent</div>
+    </div>
+
+    <!-- Blood Test -->
+    <div class="row py-2 align-items-center">
+        <div class="col-3">Blood Test</div>
+        <div class="col-2 text-center">
+            <span id="bloodIndicator" class="indicator"></span>
         </div>
+        <div class="col-4" id="bloodSymptoms"></div>
+        <div class="col-3" id="btConsent"></div>
+    </div>
+
+    <!-- Urine Test -->
+    <div class="row py-2 align-items-center">
+        <div class="col-3">Urine Test</div>
+        <div class="col-2 text-center">
+            <span id="urineIndicator" class="indicator"></span>
+        </div>
+        <div class="col-4" id="urineSymptoms"></div>
+        <div class="col-3" id="utConsent"></div>
+    </div>
+
+    <!-- Rapid Blood Sugar Test -->
+    <div class="row py-2 align-items-center">
+        <div class="col-3">Rapid Blood Sugar Test</div>
+        <div class="col-2 text-center">
+            <span id="rbstIndicator" class="indicator"></span>
+        </div>
+        <div class="col-4" id="rbstSymptoms"></div>
+        <div class="col-3" id="rbstConsent"></div>
+    </div>
+
+    <!-- X-Ray -->
+    <div class="row py-2 align-items-center">
+        <div class="col-3">X-Ray</div>
+        <div class="col-2 text-center">
+            <span id="xRayIndicator" class="indicator"></span>
+        </div>
+        <div class="col-4" id="xRaySymptoms"></div>
+        <div class="col-3" id="xrConsent"></div>
+    </div>
+
 
         <!-- GDrive Link at the bottom -->
-    <div class="text-center mt-3">
-        <a id="gDriveLink" href="#" target="_blank" class="btn btn-link">View Patient Virtual Card</a>
+        <div class="text-center mt-3">
+            <a id="gDriveLink" href="#" target="_blank" class="btn btn-link">View Patient Virtual Card</a>
+        </div>
     </div>
+
 
 </div>
 
@@ -147,7 +165,6 @@
 
         if (value === "1") {
             li.style.display = "list-item";
-            span.textContent = yesNo(value);
         } else {
             li.style.display = "none";
         }
@@ -159,33 +176,80 @@
     toggleVisibility("xRay", "liXRay", "xRay");
 
     // Set Doctor View indicator and consent
-    function updateDrView(testKey, consentKey, indicatorId, displayId) {
-    const testValue = params.get(testKey);       // "1" if symptom/test present, "0" if not
-    const consentValue = params.get(consentKey); // "1" if consent given, "0" if not
+    function buildSymptoms(symptomKeys) {
+        const labels = {
+            fever: "Fever",
+            cough: "Cough",
+            headache: "Headache",
+            urinaryHesitancy: "Urinary Hesitancy",
+            urinaryFrequency: "Urinary Frequency",
+            amenorrhea: "Amenorrhea"
+        };
 
-    const indicator = document.getElementById(indicatorId);
-    const displaySpan = document.getElementById(displayId);
+        const found = symptomKeys
+            .filter(k => params.get(k) === "1")
+            .map(k => labels[k]);
 
-    if (testValue === "1") {
-        // Test/symptom present
-        indicator.style.backgroundColor = "blue"; // true = blue
-        if (consentValue === "1") {
-            displaySpan.textContent = "Consent";
-        } else {
-            displaySpan.textContent = "No Consent";
-        }
-    } else {
-        // Test/symptom not present
-        indicator.style.backgroundColor = "red";  // false = red
-        displaySpan.textContent = "No Symptom";
+        return found.length > 0 ? found.join(", ") : "No symptom";
     }
-}
 
-    // Apply to each test
-    updateDrView("bloodTest", "btConsent", "bloodIndicator", "btConsent");
-    updateDrView("urineTest", "utConsent", "urineIndicator", "utConsent");
-    updateDrView("rapidBloodSugarTest", "rbstConsent", "rbstIndicator", "rbstConsent");
-    updateDrView("xRay", "xrConsent", "xRayIndicator", "xrConsent");
+    function updateDrView(testKey, consentKey, indicatorId, symptomsId, consentId, symptomKeys) {
+        const testValue = params.get(testKey);
+        const consentValue = params.get(consentKey);
+
+        const indicator = document.getElementById(indicatorId);
+        const symptoms = document.getElementById(symptomsId);
+        const consent = document.getElementById(consentId);
+
+        symptoms.textContent = buildSymptoms(symptomKeys);
+
+        if (testValue === "1") {
+            indicator.style.backgroundColor = "blue";
+
+            consent.textContent = consentValue === "1"
+                ? "Consent"
+                : "No Consent";
+        } else {
+            indicator.style.backgroundColor = "red";
+            consent.textContent = "-";
+        }
+    }
+
+    updateDrView(
+    "bloodTest",
+    "btConsent",
+    "bloodIndicator",
+    "bloodSymptoms",
+    "btConsent",
+    ["fever"]
+    );
+
+    updateDrView(
+        "urineTest",
+        "utConsent",
+        "urineIndicator",
+        "urineSymptoms",
+        "utConsent",
+        ["urinaryHesitancy"]
+    );
+
+    updateDrView(
+        "rapidBloodSugarTest",
+        "rbstConsent",
+        "rbstIndicator",
+        "rbstSymptoms",
+        "rbstConsent",
+        ["urinaryFrequency"]
+    );
+
+    updateDrView(
+        "xRay",
+        "xrConsent",
+        "xRayIndicator",
+        "xRaySymptoms",
+        "xrConsent",
+        ["cough"]
+    );
 </script>
 
 </body>
