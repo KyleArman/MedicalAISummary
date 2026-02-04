@@ -187,42 +187,47 @@
         };
 
         const found = symptomKeys
-            .filter(k => params.get(k) === "1")
+            .filter(k => params.get(k) == "1")
             .map(k => labels[k]);
 
-        return found.length > 0 ? found.join(", ") : "No symptom";
+        return found;
     }
 
-    function updateDrView(testKey, consentKey, indicatorId, symptomsId, consentId, symptomKeys) {
-    const testValue = params.get(testKey);
-    const consentValue = params.get(consentKey);
+    function updateDrView(testKey, consentKey, indicatorId, symptomsId, consentId, symptomKeys, forceBlueOnSymptom = false) {
 
-    const indicator = document.getElementById(indicatorId);
-    const symptoms = document.getElementById(symptomsId);
-    const consent = document.getElementById(consentId);
+        const testValue = params.get(testKey) == "1";
+        const consentValue = params.get(consentKey) == "1";
 
-    symptoms.textContent = buildSymptoms(symptomKeys);
+        const indicator = document.getElementById(indicatorId);
+        const symptomsEl = document.getElementById(symptomsId);
+        const consentEl = document.getElementById(consentId);
 
-    if (testValue == "1") {   // <-- loose comparison on purpose
-        indicator.style.backgroundColor = "blue";
+        const symptoms = buildSymptoms(symptomKeys);
+        const hasSymptom = symptoms.length > 0;
 
-        consent.textContent = (consentValue == "1")
-            ? "Consent"
-            : "No Consent";
+        // --- Symptoms display ---
+        symptomsEl.textContent = hasSymptom ? symptoms.join(", ") : "No symptom";
 
-    } else {
-        indicator.style.backgroundColor = "red";
-        consent.textContent = "-";
+        // --- Indicator logic ---
+        let isBlue = testValue || (forceBlueOnSymptom && hasSymptom);
+
+        indicator.style.backgroundColor = isBlue ? "blue" : "red";
+
+        // --- Consent logic ---
+        if (isBlue) {
+            consentEl.textContent = consentValue ? "Consent" : "No Consent";
+        } else {
+            consentEl.textContent = hasSymptom ? "No Consent" : "-";
+        }
     }
-}
 
     updateDrView(
-    "bloodTest",
-    "btConsent",
-    "bloodIndicator",
-    "bloodSymptoms",
-    "btConsent",
-    ["fever"]
+        "bloodTest",
+        "btConsent",
+        "bloodIndicator",
+        "bloodSymptoms",
+        "btConsent",
+        ["fever"]
     );
 
     updateDrView(
@@ -231,7 +236,8 @@
         "urineIndicator",
         "urineSymptoms",
         "utConsent",
-        ["urinaryHesitancy"]
+        ["urinaryHesitancy", "amenorrhea"],
+        true
     );
 
     updateDrView(
@@ -240,7 +246,8 @@
         "rbstIndicator",
         "rbstSymptoms",
         "rbstConsent",
-        ["urinaryFrequency"]
+        ["urinaryFrequency"],
+        true
     );
 
     updateDrView(
