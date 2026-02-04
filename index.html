@@ -86,11 +86,11 @@
         <div class="box">
             <h4>To Do</h4>
             <ul class="list-group">
-                <li id="liBloodTest" class="list-group-item">Blood Test (Lab Sample) <span id="bloodTest" class="value"></span></li>
-                <li id="liUrineTest" class="list-group-item">Urine Test (Lab Sample) <span id="urineTest" class="value"></span></li>
-                <li id="liRbst" class="list-group-item">Rapid Blood Sugar Test (Lab Sample) <span id="rbst" class="value"></span></li>
-                <li id="liXRay" class="list-group-item">X-Ray <span id="xRay" class="value"></span></li>
-                <li id="liBPTest" class="list-group-item">Blood Pressure Test <span id="bpTest" class="value"></span></li>
+                <li id="liBloodTest" class="list-group-item">Blood Test (Lab Sample)</li>
+                <li id="liUrineTest" class="list-group-item">Urine Test (Lab Sample)</li>
+                <li id="liRbst" class="list-group-item">Rapid Blood Sugar Test (Lab Sample)</li>
+                <li id="liXRay" class="list-group-item">X-Ray</li>
+                <li id="liBPTest" class="list-group-item">Blood Pressure Test</li>
                 <li class="list-group-item">See the Doctor</li>
                 <li class="list-group-item">Collect Prescribed Medicine at the Pharmacy</li>
             </ul>
@@ -157,23 +157,17 @@
     <script>
         const params = new URLSearchParams(window.location.search);
 
-        // ✅ Helper: To Do Visibility
-        function toggleVisibility(testKey, liId, spanId) {
+        function toggleVisibility(testKey, liId) {
             const value = params.get(testKey);
             const li = document.getElementById(liId);
-            const span = document.getElementById(spanId);
-
-            if (value === "1") {
-                li.style.display = "list-item";
-                span.textContent = "Pending";
-            } else {
-                li.style.display = "none";
-            }
+            li.style.display = (value === "1") ? "list-item" : "none";
         }
 
-        ["bloodTest","urineTest","rapidBloodSugarTest","xRay","bloodPressureTest"].forEach(key => {
-            toggleVisibility(key, "li" + key.charAt(0).toUpperCase() + key.slice(1), key);
-        });
+        toggleVisibility("bloodTest", "liBloodTest");
+        toggleVisibility("urineTest", "liUrineTest");
+        toggleVisibility("rapidBloodSugarTest", "liRbst");
+        toggleVisibility("xRay", "liXRay");
+        toggleVisibility("bloodPressureTest", "liBPTest");
 
         // ✅ Helper: build Symptoms text with durations
         function buildSymptoms(symptomKeys) {
