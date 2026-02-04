@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Summary</title>
+</head>
+<body>
+
+<h2>Requested Tests</h2>
+<ul>
+    <li>Blood Test: <span id="bloodTest"></span></li>
+    <li>Urine Test: <span id="urineTest"></span></li>
+    <li>Rapid Blood Sugar Test: <span id="rbst"></span></li>
+    <li>X-Ray: <span id="xray"></span></li>
+</ul>
+
+<h2>Consents</h2>
+<ul>
+    <li>Blood Test Consent: <span id="btConsent"></span></li>
+    <li>Urine Test Consent: <span id="utConsent"></span></li>
+    <li>Rapid Blood Sugar Test Consent: <span id="rbstConsent"></span></li>
+    <li>X-Ray Consent: <span id="xrConsent"></span></li>
+</ul>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+
+    function yesNo(value) {
+        return value === "1" ? "Yes" : "No";
+    }
+
+    // Tests
+    document.getElementById("bloodTest").textContent =
+        yesNo(params.get("bloodTest"));
+
+    document.getElementById("urineTest").textContent =
+        yesNo(params.get("urineTest"));
+
+    document.getElementById("rbst").textContent =
+        yesNo(params.get("rapidBloodSugarTest"));
+
+    document.getElementById("xray").textContent =
+        yesNo(params.get("xRay"));
+
+    // Consents
+    document.getElementById("btConsent").textContent =
+        yesNo(params.get("btConsent"));
+
+    document.getElementById("utConsent").textContent =
+        yesNo(params.get("utConsent"));
+
+    document.getElementById("rbstConsent").textContent =
+        yesNo(params.get("rbstConsent"));
+
+    document.getElementById("xrConsent").textContent =
+        yesNo(params.get("xrConsent"));
+</script>
+
+</body>
+</html>
