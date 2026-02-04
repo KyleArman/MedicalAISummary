@@ -194,28 +194,27 @@
     }
 
     function updateDrView(testKey, consentKey, indicatorId, symptomsId, consentId, symptomKeys) {
-        const testValue = params.get(testKey);
-        const consentValue = params.get(consentKey);
+    const testValue = params.get(testKey);
+    const consentValue = params.get(consentKey);
 
-        const indicator = document.getElementById(indicatorId);
-        const symptoms = document.getElementById(symptomsId);
-        const consent = document.getElementById(consentId);
+    const indicator = document.getElementById(indicatorId);
+    const symptoms = document.getElementById(symptomsId);
+    const consent = document.getElementById(consentId);
 
-        symptoms.textContent = buildSymptoms(symptomKeys);
+    symptoms.textContent = buildSymptoms(symptomKeys);
 
-        if (testValue === "1") {
-            indicator.style.backgroundColor = "blue";
+    if (testValue == "1") {   // <-- loose comparison on purpose
+        indicator.style.backgroundColor = "blue";
 
-            if (consentValue === "1") {
-                consent.textContent = "Consent";
-            } else {
-                consent.textContent = "No Consent";
-            }
-        } else {
-            indicator.style.backgroundColor = "red";
-            consent.textContent = "-";
-        }
+        consent.textContent = (consentValue == "1")
+            ? "Consent"
+            : "No Consent";
+
+    } else {
+        indicator.style.backgroundColor = "red";
+        consent.textContent = "-";
     }
+}
 
     updateDrView(
     "bloodTest",
