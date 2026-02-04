@@ -96,55 +96,53 @@
             </ul>
         </div>
 
-        <!-- Doctor View -->
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <h4 class="mb-0">Doctor View</h4>
-            <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#doctorView" aria-expanded="true" aria-controls="doctorView">
-                Toggle
-            </button>
-        </div>
-
+        <!-- Doctor View Content (OPEN by default) -->
         <div class="collapse show" id="doctorView">
+
             <!-- Header Row -->
-            <div class="dr-row fw-bold text-muted border-bottom">
-                <div class="col-test">Test</div>
-                <div class="col-symptom">Symptoms</div>
-                <div class="col-consent">Consent</div>
+            <div class="row fw-bold mb-2 text-muted">
+                <div class="col-4">Test</div>
+                <div class="col-5">Symptoms</div>
+                <div class="col-3">Consent</div>
             </div>
 
-            <!-- Rows -->
-            <div id="drContent">
-                <div class="dr-row" id="rowBloodTest">
-                    <div class="col-test">Blood Test</div>
-                    <div class="col-symptom" id="bloodSymptoms"></div>
-                    <div class="col-consent" id="btConsent"></div>
-                </div>
-
-                <div class="dr-row" id="rowUrineTest">
-                    <div class="col-test">Urine Test</div>
-                    <div class="col-symptom" id="urineSymptoms"></div>
-                    <div class="col-consent" id="utConsent"></div>
-                </div>
-
-                <div class="dr-row" id="rowRbst">
-                    <div class="col-test">Rapid Blood Sugar Test</div>
-                    <div class="col-symptom" id="rbstSymptoms"></div>
-                    <div class="col-consent" id="rbstConsent"></div>
-                </div>
-
-                <div class="dr-row" id="rowXRay">
-                    <div class="col-test">X-Ray</div>
-                    <div class="col-symptom" id="xRaySymptoms"></div>
-                    <div class="col-consent" id="xrConsent"></div>
-                </div>
-
-                <div class="dr-row" id="rowBPTest">
-                    <div class="col-test">Blood Pressure Test</div>
-                    <div class="col-symptom" id="bpSymptoms"></div>
-                    <div class="col-consent" id="bpConsent"></div>
-                </div>
+            <!-- Blood Test -->
+            <div class="row py-2 align-items-center">
+                <div class="col-4">Blood Test</div>
+                <div class="col-5" id="bloodSymptoms"></div>
+                <div class="col-3" id="btConsent"></div>
             </div>
+
+            <!-- Urine Test -->
+            <div class="row py-2 align-items-center">
+                <div class="col-4">Urine Test</div>
+                <div class="col-5" id="urineSymptoms"></div>
+                <div class="col-3" id="utConsent"></div>
+            </div>
+
+            <!-- Rapid Blood Sugar Test -->
+            <div class="row py-2 align-items-center">
+                <div class="col-4">Rapid Blood Sugar Test</div>
+                <div class="col-5" id="rbstSymptoms"></div>
+                <div class="col-3" id="rbstConsent"></div>
+            </div>
+
+            <!-- X-Ray -->
+            <div class="row py-2 align-items-center">
+                <div class="col-4">X-Ray</div>
+                <div class="col-5" id="xRaySymptoms"></div>
+                <div class="col-3" id="xrConsent"></div>
+            </div>
+
+            <!-- Blood Pressure Test -->
+            <div class="row py-2 align-items-center">
+                <div class="col-4">Blood Pressure Test</div>
+                <div class="col-5" id="bpSymptoms"></div>
+                <div class="col-3" id="bpConsent"></div>
+            </div>
+
         </div>
+
 
         <!-- GDrive Link -->
         <div class="text-center mt-3">
@@ -157,6 +155,7 @@
     <script>
         const params = new URLSearchParams(window.location.search);
 
+        // ✅ To Do: only show test if its boolean is 1, no "Pending" text
         function toggleVisibility(testKey, liId) {
             const value = params.get(testKey);
             const li = document.getElementById(liId);
@@ -169,7 +168,7 @@
         toggleVisibility("xRay", "liXRay");
         toggleVisibility("bloodPressureTest", "liBPTest");
 
-        // ✅ Helper: build Symptoms text with durations
+        // Build symptoms text with duration for fever and cough
         function buildSymptoms(symptomKeys) {
             const labels = {
                 fever: "Fever",
@@ -180,23 +179,24 @@
                 amenorrhea: "Amenorrhea"
             };
 
-            const durations = {
-                fever: params.get("durationFever"),
-                cough: params.get("durationCough")
-            };
-
             const found = symptomKeys
                 .filter(k => params.get(k) === "1")
                 .map(k => {
-                    let text = labels[k];
-                    if (durations[k]) text += ` (${durations[k]} days)`;
-                    return text;
+                    if (k === "fever") {
+                        const dur = parseInt(params.get("durationFever")) || 0;
+                        return dur ? `Fever (${dur} days)` : "Fever";
+                    }
+                    if (k === "cough") {
+                        const dur = parseInt(params.get("durationCough")) || 0;
+                        return dur ? `Cough (${dur} days)` : "Cough";
+                    }
+                    return labels[k];
                 });
 
             return found.length > 0 ? found.join(", ") : null;
         }
 
-        // ✅ Update Doctor View
+        // Update Doctor View row with duration-based consent for fever and cough
         function updateDrView(testKey, consentKey, symptomsId, consentId, symptomKeys) {
             const consentValue = params.get(consentKey);
             const symptomsEl = document.getElementById(symptomsId);
@@ -204,32 +204,30 @@
 
             const symptomText = buildSymptoms(symptomKeys);
 
-            // Special: urine tests always blue if urinary symptoms exist
-            const hasUrinarySymptom = symptomKeys.some(k => ["urinaryHesitancy","amenorrhea","urinaryFrequency"].includes(k) && params.get(k) === "1");
-
+            // Determine consent for fever/cough based on duration
+            let finalConsent = "-";
             if (symptomText) {
-                symptomsEl.textContent = symptomText;
-                consentEl.textContent = (consentValue === "1") ? "Consent" : "No Consent";
-            } else {
-                symptomsEl.textContent = "No symptom";
-                consentEl.textContent = "-";
+                if (testKey === "bloodTest" && symptomKeys.includes("fever")) {
+                    const dur = parseInt(params.get("durationFever")) || 0;
+                    finalConsent = dur >= 3 ? "Consent" : "No Consent";
+                } else if (testKey === "xRay" && symptomKeys.includes("cough")) {
+                    const dur = parseInt(params.get("durationCough")) || 0;
+                    finalConsent = dur >= 21 ? "Consent" : "No Consent";
+                } else {
+                    finalConsent = (consentValue === "1") ? "Consent" : "No Consent";
+                }
             }
+
+            symptomsEl.textContent = symptomText || "No symptom";
+            consentEl.textContent = finalConsent;
         }
 
-        // Blood Test
-        updateDrView("bloodTest","btConsent","bloodSymptoms","btConsent",["fever"]);
-        // Urine Test
-        updateDrView("urineTest","utConsent","urineSymptoms","utConsent",["urinaryHesitancy","amenorrhea"]);
-        // Rapid Blood Sugar Test
-        updateDrView("rapidBloodSugarTest","rbstConsent","rbstSymptoms","rbstConsent",["urinaryFrequency"]);
-        // X-Ray
-        updateDrView("xRay","xrConsent","xRaySymptoms","xrConsent",["cough"]);
-        // Blood Pressure Test
-        updateDrView("bloodPressureTest","bpConsent","bpSymptoms","bpConsent",["headache"]);
-
-        // Optional: GDrive Link
-        const gDrive = params.get("gDriveURL");
-        if(gDrive) document.getElementById("gDriveLink").href = gDrive;
+        // Apply to each test
+        updateDrView("bloodTest", "btConsent", "bloodSymptoms", "btConsent", ["fever"]);
+        updateDrView("urineTest", "utConsent", "urineSymptoms", "utConsent", ["urinaryHesitancy","amenorrhea"]);
+        updateDrView("rapidBloodSugarTest", "rbstConsent", "rbstSymptoms", "rbstConsent", ["urinaryFrequency"]);
+        updateDrView("xRay", "xrConsent", "xRaySymptoms", "xrConsent", ["cough"]);
+        updateDrView("bloodPressureTest", "bpConsent", "bpSymptoms", "bpConsent", ["headache"]);
     </script>
     </body>
 </html>
