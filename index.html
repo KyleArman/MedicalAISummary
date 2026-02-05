@@ -53,25 +53,36 @@
                 display: flex;
                 flex-wrap: wrap;
                 padding: 5px 0;
-                font-size: 0.95rem;
+                font-size: 1rem; /* base font larger */
             }
 
             .dr-row div {
                 padding: 4px 6px;
             }
 
-            .col-test { flex: 25%; min-width: 120px; }
-            .col-symptom { flex: 40%; min-width: 140px; }
-            .col-consent { flex: 35%; min-width: 100px; }
+            /* Column flexes, remove strict min-width */
+            .col-test { flex: 25%; }
+            .col-indicator { flex: 10%; text-align: center; }
+            .col-symptom { flex: 40%; }
+            .col-consent { flex: 25%; }
 
+            /* Mobile responsiveness */
             @media (max-width: 576px) {
-                .dr-row { font-size: 0.85rem; }
-                .col-test, .col-symptom, .col-consent { min-width: 100%; flex: 100%; margin-bottom: 4px; }
+                .dr-row {
+                    flex-direction: column;
+                    font-size: 1rem; /* readable on small screen */
+                    gap: 4px;
+                }
+                .col-test, .col-indicator, .col-symptom, .col-consent {
+                    flex: 100%;
+                    min-width: auto;
+                    text-align: left;
+                }
             }
-
             .original-size {
-                max-width: 75%; /* ensures it scales down on small screens */
-                height: auto;    /* keeps aspect ratio */
+                width: 90%;      /* fills most of the screen */
+                max-width: 400px; /* don’t exceed desktop size */
+                height: auto;
             }
 
             .indicator {
@@ -128,61 +139,61 @@
             <div class="collapse show" id="drView">
 
                 <!-- Header Row -->
-                <div class="row fw-bold mb-2 text-muted px-2">
-                    <div class="col-3">Medical Test</div>
-                    <div class="col-3 text-center">Indicator</div>
-                    <div class="col-3">Symptoms</div>
-                    <div class="col-3">Consent</div>
+                <div class="row fw-bold mb-2 text-muted dr-row">
+                    <div class="col-test">Medical Test</div>
+                    <div class="col-indicator text-center">Indicator</div>
+                    <div class="col-symptom">Symptoms</div>
+                    <div class="col-consent">Consent</div>
                 </div>
 
                 <!-- Blood Test -->
-                <div class="row py-2 align-items-center" id="bloodRow">
-                    <div class="col-3">Blood Test</div>
-                    <div class="col-1 text-center">
+                <div class="row py-2 align-items-center dr-row" id="bloodRow">
+                    <div class="col-test">Blood Test</div>
+                    <div class="col-indicator">
                         <span id="bloodIndicator" class="indicator"></span>
                     </div>
-                    <div class="col-5" id="bloodSymptoms"></div>
-                    <div class="col-3" id="btConsent"></div>
+                    <div class="col-symptom" id="bloodSymptoms"></div>
+                    <div class="col-consent" id="btConsent"></div>
                 </div>
 
                 <!-- Urine Test -->
-                <div class="row py-2 align-items-center" id="urineRow">
-                    <div class="col-3">Urine Test</div>
-                    <div class="col-1 text-center">
+                <div class="row py-2 align-items-center dr-row" id="urineRow">
+                    <div class="col-test">Urine Test</div>
+                    <div class="col-indicator">
                         <span id="urineIndicator" class="indicator"></span>
                     </div>
-                    <div class="col-5" id="urineSymptoms"></div>
-                    <div class="col-3" id="utConsent"></div>
+                    <div class="col-symptom" id="urineSymptoms"></div>
+                    <div class="col-consent" id="utConsent"></div>
                 </div>
 
                 <!-- Rapid Blood Sugar Test -->
-                <div class="row py-2 align-items-center" id="rbstRow">
-                    <div class="col-3">Rapid Blood Sugar Test</div>
-                    <div class="col-1 text-center">
+                <div class="row py-2 align-items-center dr-row" id="rbstRow">
+                    <div class="col-test">Rapid Blood Sugar Test</div>
+                    <div class="col-indicator">
                         <span id="rbstIndicator" class="indicator"></span>
                     </div>
-                    <div class="col-5" id="rbstSymptoms"></div>
-                    <div class="col-3" id="rbstConsent"></div>
+                    <div class="col-symptom" id="rbstSymptoms"></div>
+                    <div class="col-consent" id="rbstConsent"></div>
                 </div>
 
                 <!-- X-Ray -->
-                <div class="row py-2 align-items-center" id="xRayRow">
-                    <div class="col-3">X-Ray</div>
-                    <div class="col-1 text-center">
+                <div class="row py-2 align-items-center dr-row" id="xRayRow">
+                    <div class="col-test">X-Ray</div>
+                    <div class="col-indicator">
                         <span id="xRayIndicator" class="indicator"></span>
                     </div>
-                    <div class="col-5" id="xRaySymptoms"></div>
-                    <div class="col-3" id="xrConsent"></div>
+                    <div class="col-symptom" id="xRaySymptoms"></div>
+                    <div class="col-consent" id="xrConsent"></div>
                 </div>
 
                 <!-- Blood Pressure Test -->
-                <div class="row py-2 align-items-center" id="bpRow">
-                    <div class="col-3">Blood Pressure Test</div>
-                    <div class="col-1 text-center">
+                <div class="row py-2 align-items-center dr-row" id="bpRow">
+                    <div class="col-test">Blood Pressure Test</div>
+                    <div class="col-indicator">
                         <span id="bpIndicator" class="indicator"></span>
                     </div>
-                    <div class="col-5" id="bpSymptoms"></div>
-                    <!-- <div class="col-3" id="utConsent"></div> -->
+                    <div class="col-symptom" id="bpSymptoms"></div>
+                    <div class="col-consent" id="bpConsent"></div>
                 </div>
 
             </div>
