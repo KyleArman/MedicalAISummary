@@ -305,6 +305,8 @@
 
             // 🔵 / 🔴 Indicator logic
             indicator.className = "indicator " + (finalConsent === "Consent" ? "blue" : "red");
+            if (testKey === "bloodPressureTest")
+            indicator.className = "indicator " + (finalConsent === "blue");
         }
 
         // Apply for each test
