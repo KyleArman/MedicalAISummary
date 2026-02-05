@@ -265,11 +265,13 @@
             if (testKey === "bloodTest") {
                 const d = parseInt(params.get("durationFever")) || 0;
                 finalConsent = d >= 3 ? "Consent" : "-";
+                finalConsent = (consentValue === "1") ? "Consent" : "No Consent";
             }
             // Cough → ≥21 days
             else if (testKey === "xRay") {
                 const d = parseInt(params.get("durationCough")) || 0;
                 finalConsent = d >= 21 ? "Consent" : "-";
+                finalConsent = (consentValue === "1") ? "Consent" : "No Consent";
             }
             // Headache → always "-"
             else if (testKey === "bloodPressureTest") {
