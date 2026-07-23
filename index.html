@@ -150,35 +150,37 @@
             margin-top: 4px;
         }
 
-        /* PATIENT SUMMARY TABLE (formerly "Medical Test Summary") */
-        .dr-row {
-            display: flex;
-            flex-wrap: wrap;
-            padding: 8px 4px;
-            font-size: 0.85rem;
-            border-bottom: 1px solid var(--divider-blue);
+        /* PATIENT SUMMARY — each test as a stacked, centered card (name+status on top,
+           symptoms and consent centered underneath) instead of a side-by-side table
+           layout or left-aligned block. */
+        .test-card {
+            display: none; /* JS sets to "flex" (with flex-direction: column below) when applicable */
+            flex-direction: column;
             align-items: center;
+            text-align: center;
+            gap: 6px;
+            padding: 16px 8px;
+            border-bottom: 1px solid var(--divider-blue);
         }
-        .dr-row:last-child { border-bottom: none; }
-        .dr-row div { padding: 2px 4px; }
-        .col-test      { flex: 28%; color: var(--navy); font-weight: 500; }
-        .col-indicator { flex: 10%; text-align: center; }
-        .col-symptom   { flex: 38%; color: var(--muted-blue); }
-        .col-consent   { flex: 24%; color: var(--muted-blue); font-size: 0.8rem; }
-        .fw-header .col-test,
-        .fw-header .col-symptom,
-        .fw-header .col-consent {
+        .test-card:last-child { border-bottom: none; }
+        .test-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .test-name { color: var(--navy); font-weight: 600; font-size: 0.92rem; }
+        .test-detail {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+        .detail-label {
             color: var(--royal-blue);
-            font-size: 0.78rem;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
-        @media (max-width: 480px) {
-            .dr-row { flex-direction: column; gap: 3px; }
-            .col-test, .col-indicator, .col-symptom, .col-consent { flex: 100%; min-width: auto; text-align: left; }
-            .fw-header { display: none; }
-        }
+        .detail-value { color: var(--muted-blue); }
 
         .indicator { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
         .indicator.blue { background-color: var(--accent-blue); box-shadow: 0 0 6px rgba(14, 165, 233, 0.5); }
@@ -228,46 +230,49 @@
     <div class="section-card">
         <p class="section-title">Patient Summary</p>
 
-        <div class="dr-row fw-header">
-            <div class="col-test">Medical Test</div>
-            <div class="col-indicator" style="color:var(--royal-blue);font-size:0.78rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Status</div>
-            <div class="col-symptom">Symptoms</div>
-            <div class="col-consent">Consent</div>
+        <div class="test-card" id="bloodRow">
+            <div class="test-card-header">
+                <span id="bloodIndicator" class="indicator"></span>
+                <span class="test-name">Blood Test</span>
+            </div>
+            <div class="test-detail"><span class="detail-label">Symptoms</span><span class="detail-value" id="bloodSymptoms"></span></div>
+            <div class="test-detail"><span class="detail-label">Consent</span><span class="detail-value" id="btConsent"></span></div>
         </div>
 
-        <div class="dr-row" id="bloodRow" style="display:none">
-            <div class="col-test">Blood Test</div>
-            <div class="col-indicator"><span id="bloodIndicator" class="indicator"></span></div>
-            <div class="col-symptom" id="bloodSymptoms"></div>
-            <div class="col-consent" id="btConsent"></div>
+        <div class="test-card" id="urineRow">
+            <div class="test-card-header">
+                <span id="urineIndicator" class="indicator"></span>
+                <span class="test-name">Urine Test</span>
+            </div>
+            <div class="test-detail"><span class="detail-label">Symptoms</span><span class="detail-value" id="urineSymptoms"></span></div>
+            <div class="test-detail"><span class="detail-label">Consent</span><span class="detail-value" id="utConsent"></span></div>
         </div>
 
-        <div class="dr-row" id="urineRow" style="display:none">
-            <div class="col-test">Urine Test</div>
-            <div class="col-indicator"><span id="urineIndicator" class="indicator"></span></div>
-            <div class="col-symptom" id="urineSymptoms"></div>
-            <div class="col-consent" id="utConsent"></div>
+        <div class="test-card" id="rbstRow">
+            <div class="test-card-header">
+                <span id="rbstIndicator" class="indicator"></span>
+                <span class="test-name">Rapid Blood Sugar Test</span>
+            </div>
+            <div class="test-detail"><span class="detail-label">Symptoms</span><span class="detail-value" id="rbstSymptoms"></span></div>
+            <div class="test-detail"><span class="detail-label">Consent</span><span class="detail-value" id="rbstConsent"></span></div>
         </div>
 
-        <div class="dr-row" id="rbstRow" style="display:none">
-            <div class="col-test">Rapid Blood Sugar Test</div>
-            <div class="col-indicator"><span id="rbstIndicator" class="indicator"></span></div>
-            <div class="col-symptom" id="rbstSymptoms"></div>
-            <div class="col-consent" id="rbstConsent"></div>
+        <div class="test-card" id="xRayRow">
+            <div class="test-card-header">
+                <span id="xRayIndicator" class="indicator"></span>
+                <span class="test-name">X-Ray</span>
+            </div>
+            <div class="test-detail"><span class="detail-label">Symptoms</span><span class="detail-value" id="xRaySymptoms"></span></div>
+            <div class="test-detail"><span class="detail-label">Consent</span><span class="detail-value" id="xrConsent"></span></div>
         </div>
 
-        <div class="dr-row" id="xRayRow" style="display:none">
-            <div class="col-test">X-Ray</div>
-            <div class="col-indicator"><span id="xRayIndicator" class="indicator"></span></div>
-            <div class="col-symptom" id="xRaySymptoms"></div>
-            <div class="col-consent" id="xrConsent"></div>
-        </div>
-
-        <div class="dr-row" id="bpRow" style="display:none">
-            <div class="col-test">Blood Pressure Test</div>
-            <div class="col-indicator"><span id="bpIndicator" class="indicator blue"></span></div>
-            <div class="col-symptom" id="bpSymptoms"></div>
-            <div class="col-consent" id="bpConsent"></div>
+        <div class="test-card" id="bpRow">
+            <div class="test-card-header">
+                <span id="bpIndicator" class="indicator blue"></span>
+                <span class="test-name">Blood Pressure Test</span>
+            </div>
+            <div class="test-detail"><span class="detail-label">Symptoms</span><span class="detail-value" id="bpSymptoms"></span></div>
+            <div class="test-detail"><span class="detail-label">Consent</span><span class="detail-value" id="bpConsent"></span></div>
         </div>
 
     </div>
