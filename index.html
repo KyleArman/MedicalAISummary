@@ -1,365 +1,424 @@
-<!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Patient Summary</title>
-        <link href="bootstrap.min.css" rel="stylesheet">
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 10px;
-                background-color: #f8f9fa;
-            }
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Summary</title>
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
 
-            .top-image {
-                max-width: 100%;
-                display: block;
-                margin: 0 auto 15px auto;
-            }
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            margin: 0;
+            padding: 12px;
+            background-color: #1a1a2e;
+            min-height: 100vh;
+        }
 
-            .summary-container {
-                background-color: #fff;
-                border-radius: 10px;
-                padding: 15px;
-                box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            }
+        .page-wrapper {
+            max-width: 700px;
+            margin: 0 auto;
+        }
 
-            .box {
-                border: 1px solid #dee2e6;
-                border-radius: 8px;
-                padding: 12px;
-                margin-bottom: 15px;
-                background-color: #f1f3f5;
-            }
+        /* MAP CARD */
+        .map-card {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+        .map-card h4 {
+            color: #00d4ff;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            margin: 0 0 10px 0;
+            letter-spacing: 0.5px;
+        }
+        .map-card img { width: 100%; height: auto; border-radius: 8px; display: block; }
 
-            .box h4 {
-                margin-bottom: 10px;
-                font-size: 1.2rem;
-            }
+        /* SUMMARY PANEL */
+        .summary-panel {
+            background: #2b2b3b;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+        .summary-row {
+            display: flex;
+            align-items: flex-start;
+            border-bottom: 2px solid #00cfff;
+            padding: 10px 14px;
+            gap: 10px;
+        }
+        .summary-row:last-child { border-bottom: none; }
+        .summary-label {
+            color: #00cfff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            min-width: 130px;
+            flex-shrink: 0;
+            padding-top: 2px;
+        }
+        .summary-value {
+            color: #e8e8f0;
+            font-size: 0.9rem;
+            font-weight: 500;
+            flex: 1;
+            line-height: 1.6;
+        }
+        .consent-tag {
+            color: #aaaacc;
+            font-size: 0.8rem;
+            font-weight: 400;
+        }
 
-            .value {
-                font-weight: bold;
-            }
+        /* NEXT STATION */
+        .section-card {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            border: 1px solid rgba(0,207,255,0.2);
+        }
+        .section-title {
+            color: #00cfff;
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 0 0 14px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.4px;
+        }
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 18px;
+            background: #00cfff;
+            border-radius: 2px;
+        }
 
-            .yes {
-                color: blue;
-            }
+        /* Stepper */
+        .station-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            position: relative;
+        }
+        .station-list::before {
+            content: '';
+            position: absolute;
+            left: 14px;
+            top: 20px;
+            bottom: 20px;
+            width: 2px;
+            background: rgba(0,207,255,0.15);
+        }
+        .station-item {
+            display: none;
+            align-items: center;
+            gap: 14px;
+            padding: 9px 0;
+            position: relative;
+        }
+        .station-item.always { display: flex; }
+        .station-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(0,207,255,0.1);
+            border: 2px solid #00cfff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #00cfff;
+            z-index: 1;
+        }
+        .station-info { flex: 1; }
+        .station-name { color: #e8e8f0; font-weight: 600; font-size: 0.88rem; }
+        .station-sub  { color: #7777a0; font-size: 0.78rem; margin-top: 1px; }
 
-            .no {
-                color: red;
-            }
+        /* Current (first) station highlight */
+        .station-item.current .station-icon {
+            background: #00cfff;
+            color: #16213e;
+            box-shadow: 0 0 12px rgba(0,207,255,0.55);
+        }
+        .station-item.current .station-name { color: #00cfff; }
+        .station-item.current .station-sub  { color: rgba(0,207,255,0.7); }
 
-            .dr-row {
-                display: flex;
-                flex-wrap: wrap;
-                padding: 5px 0;
-                font-size: 1rem; /* base font larger */
-            }
+        /* DOCTOR TABLE */
+        .dr-row {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 8px 4px;
+            font-size: 0.85rem;
+            border-bottom: 1px solid rgba(0,207,255,0.08);
+            align-items: center;
+        }
+        .dr-row:last-child { border-bottom: none; }
+        .dr-row div { padding: 2px 4px; }
+        .col-test      { flex: 28%; color: #c8c8e0; font-weight: 500; }
+        .col-indicator { flex: 10%; text-align: center; }
+        .col-symptom   { flex: 38%; color: #9999b8; }
+        .col-consent   { flex: 24%; color: #9999b8; font-size: 0.8rem; }
+        .fw-header .col-test,
+        .fw-header .col-symptom,
+        .fw-header .col-consent {
+            color: rgba(0,207,255,0.6);
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        @media (max-width: 480px) {
+            .dr-row { flex-direction: column; gap: 3px; }
+            .col-test, .col-indicator, .col-symptom, .col-consent { flex: 100%; min-width: auto; text-align: left; }
+            .fw-header { display: none; }
+        }
 
-            .dr-row div {
-                padding: 4px 6px;
-            }
+        .indicator { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+        .indicator.blue { background-color: #00cfff; box-shadow: 0 0 6px rgba(0,207,255,0.65); }
+        .indicator.red  { background-color: #ff4d6d; box-shadow: 0 0 6px rgba(255,77,109,0.55); }
+    </style>
+</head>
+<body>
 
-            /* Column flexes, remove strict min-width */
-            .col-test { flex: 25%; }
-            .col-indicator { flex: 10%; text-align: center; }
-            .col-symptom { flex: 40%; }
-            .col-consent { flex: 25%; }
+<div class="page-wrapper">
 
-            /* Mobile responsiveness */
-            @media (max-width: 576px) {
-                .dr-row {
-                    flex-direction: column;
-                    font-size: 1rem; /* readable on small screen */
-                    gap: 4px;
-                }
-                .col-test, .col-indicator, .col-symptom, .col-consent {
-                    flex: 100%;
-                    min-width: auto;
-                    text-align: left;
-                }
-            }
-            .original-size {
-                width: 100%;      /* fills most of the screen */
-                max-width: 100%; /* don’t exceed desktop size */
-                height: auto;
-            }
+    <!-- MAP -->
+    <div class="map-card">
+        <h4>UTM Health Center Map</h4>
+        <img src="PKUMap.png" alt="PKU Map">
+    </div>
 
-            .indicator {
-                width: 10px;
-                height: 10px;
-                border-radius: 50%;
-                display: inline-block;
-            }
-            .indicator.blue {
-                background-color: #0d6efd; /* Bootstrap primary */
-            }
-            .indicator.red {
-                background-color: #dc3545; /* Bootstrap danger */
-            }
-        </style>
-    </head>
-    <body>
+    <!-- PATIENT SUMMARY PANEL -->
+    <div class="summary-panel" id="summaryPanel">
+        <div class="summary-row">
+            <span class="summary-label">Name:</span>
+            <span class="summary-value" id="patientName">—</span>
+        </div>
+        <div class="summary-row">
+            <span class="summary-label">Queue Number:</span>
+            <span class="summary-value" id="queueNumber">—</span>
+        </div>
+        <div class="summary-row">
+            <span class="summary-label">Symptoms:</span>
+            <span class="summary-value" id="symptomsDisplay">—</span>
+        </div>
+    </div>
 
-    <div class="summary-container">
+    <!-- NEXT STATION -->
+    <div class="section-card">
+        <p class="section-title">Next Station</p>
+        <ul class="station-list" id="stationList">
 
-        <!-- Top image inside div -->
-        <div class="text-center mb-3">
-            <h4>UTM Health Center Map</h4>
-            <img src="PKUMap.png" class="original-size" alt="PKU Map">
+            <li class="station-item" id="stLab">
+                <div class="station-icon" id="stLabNum"></div>
+                <div class="station-info">
+                    <div class="station-name">Lab Sample Counter</div>
+                    <div class="station-sub">Blood Test &middot; Urine Test &middot; Rapid Blood Sugar Test</div>
+                </div>
+            </li>
+
+            <li class="station-item" id="stXRay">
+                <div class="station-icon" id="stXRayNum"></div>
+                <div class="station-info">
+                    <div class="station-name">Diagnostic Laboratory</div>
+                    <div class="station-sub">X-Ray</div>
+                </div>
+            </li>
+
+            <li class="station-item" id="stBP">
+                <div class="station-icon" id="stBPNum"></div>
+                <div class="station-info">
+                    <div class="station-name">Doctor's Room</div>
+                    <div class="station-sub">Blood Pressure Test</div>
+                </div>
+            </li>
+
+            <li class="station-item always" id="stDoctor">
+                <div class="station-icon" id="stDoctorNum"></div>
+                <div class="station-info">
+                    <div class="station-name">Doctor's Consultation Room</div>
+                    <div class="station-sub">See the Doctor</div>
+                </div>
+            </li>
+
+            <li class="station-item always" id="stPharmacy">
+                <div class="station-icon" id="stPharmacyNum"></div>
+                <div class="station-info">
+                    <div class="station-name">Pharmacy Counter</div>
+                    <div class="station-sub">Collect Prescribed Medicine</div>
+                </div>
+            </li>
+
+        </ul>
+    </div>
+
+    <!-- MEDICAL TEST SUMMARY (always visible, no Doctor View button) -->
+    <div class="section-card">
+        <p class="section-title">Medical Test Summary</p>
+
+        <div class="dr-row fw-header">
+            <div class="col-test">Medical Test</div>
+            <div class="col-indicator" style="color:rgba(0,207,255,0.6);font-size:0.78rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Status</div>
+            <div class="col-symptom">Symptoms</div>
+            <div class="col-consent">Consent</div>
         </div>
 
-        <!-- "To Do" Box -->
-        <div class="box">
-            <h4>Patient's Tasks</h4>
-            <ul class="list-group">
-                <li id="liBloodTest" class="list-group-item">Blood Test (Lab Sample)</li>
-                <li id="liUrineTest" class="list-group-item">Urine Test (Lab Sample)</li>
-                <li id="liRbst" class="list-group-item">Rapid Blood Sugar Test (Lab Sample)</li>
-                <li id="liXRay" class="list-group-item">X-Ray (Diagnostic Lab)</li>
-                <li id="liBPTest" class="list-group-item">Blood Pressure Test (Doctor's Room)</li>
-                <li class="list-group-item">See the Doctor</li>
-                <li class="list-group-item">Collect Prescribed Medicine at the Pharmacy</li>
-            </ul>
+        <div class="dr-row" id="bloodRow" style="display:none">
+            <div class="col-test">Blood Test</div>
+            <div class="col-indicator"><span id="bloodIndicator" class="indicator"></span></div>
+            <div class="col-symptom" id="bloodSymptoms"></div>
+            <div class="col-consent" id="btConsent"></div>
         </div>
 
-        <div class="box">
-
-            <!-- Doctor View Button -->
-            <button class="btn btn-outline-primary text-start mb-2"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#drView"
-                    aria-expanded="true"
-                    aria-controls="drView">
-                Doctor View
-            </button>
-
-            <!-- Collapsible Doctor View -->
-            <div class="collapse show" id="drView">
-
-                <!-- Header Row -->
-                <div class="row fw-bold mb-2 text-muted dr-row">
-                    <div class="col-test">Medical Test</div>
-                    <div class="col-indicator text-center">Indicator</div>
-                    <div class="col-symptom">Symptoms</div>
-                    <div class="col-consent">Consent</div>
-                </div>
-
-                <!-- Blood Test -->
-                <div class="row py-2 align-items-center dr-row" id="bloodRow">
-                    <div class="col-test">Blood Test</div>
-                    <div class="col-indicator">
-                        <span id="bloodIndicator" class="indicator"></span>
-                    </div>
-                    <div class="col-symptom" id="bloodSymptoms"></div>
-                    <div class="col-consent" id="btConsent"></div>
-                </div>
-
-                <!-- Urine Test -->
-                <div class="row py-2 align-items-center dr-row" id="urineRow">
-                    <div class="col-test">Urine Test</div>
-                    <div class="col-indicator">
-                        <span id="urineIndicator" class="indicator"></span>
-                    </div>
-                    <div class="col-symptom" id="urineSymptoms"></div>
-                    <div class="col-consent" id="utConsent"></div>
-                </div>
-
-                <!-- Rapid Blood Sugar Test -->
-                <div class="row py-2 align-items-center dr-row" id="rbstRow">
-                    <div class="col-test">Rapid Blood Sugar Test</div>
-                    <div class="col-indicator">
-                        <span id="rbstIndicator" class="indicator"></span>
-                    </div>
-                    <div class="col-symptom" id="rbstSymptoms"></div>
-                    <div class="col-consent" id="rbstConsent"></div>
-                </div>
-
-                <!-- X-Ray -->
-                <div class="row py-2 align-items-center dr-row" id="xRayRow">
-                    <div class="col-test">X-Ray</div>
-                    <div class="col-indicator">
-                        <span id="xRayIndicator" class="indicator"></span>
-                    </div>
-                    <div class="col-symptom" id="xRaySymptoms"></div>
-                    <div class="col-consent" id="xrConsent"></div>
-                </div>
-
-                <!-- Blood Pressure Test -->
-                <div class="row py-2 align-items-center dr-row" id="bpRow">
-                    <div class="col-test">Blood Pressure Test</div>
-                    <div class="col-indicator">
-                        <span id="bpIndicator" class="indicator blue"></span>
-                    </div>
-                    <div class="col-symptom" id="bpSymptoms"></div>
-                    <div class="col-consent" id="bpConsent"></div>
-                </div>
-
-            </div>
+        <div class="dr-row" id="urineRow" style="display:none">
+            <div class="col-test">Urine Test</div>
+            <div class="col-indicator"><span id="urineIndicator" class="indicator"></span></div>
+            <div class="col-symptom" id="urineSymptoms"></div>
+            <div class="col-consent" id="utConsent"></div>
         </div>
 
+        <div class="dr-row" id="rbstRow" style="display:none">
+            <div class="col-test">Rapid Blood Sugar Test</div>
+            <div class="col-indicator"><span id="rbstIndicator" class="indicator"></span></div>
+            <div class="col-symptom" id="rbstSymptoms"></div>
+            <div class="col-consent" id="rbstConsent"></div>
+        </div>
 
-        <!-- GDrive Link -->
-        <div class="text-center mt-3">
-            <a id="gDriveLink" href="#" target="_blank" class="btn btn-link">View Patient Virtual Card</a>
+        <div class="dr-row" id="xRayRow" style="display:none">
+            <div class="col-test">X-Ray</div>
+            <div class="col-indicator"><span id="xRayIndicator" class="indicator"></span></div>
+            <div class="col-symptom" id="xRaySymptoms"></div>
+            <div class="col-consent" id="xrConsent"></div>
+        </div>
+
+        <div class="dr-row" id="bpRow" style="display:none">
+            <div class="col-test">Blood Pressure Test</div>
+            <div class="col-indicator"><span id="bpIndicator" class="indicator blue"></span></div>
+            <div class="col-symptom" id="bpSymptoms"></div>
+            <div class="col-consent" id="bpConsent"></div>
         </div>
 
     </div>
 
-    <script src="bootstrap.bundle.min.js"></script>
-    <script>
-        const params = new URLSearchParams(window.location.search);
+</div><!-- end page-wrapper -->
 
-        // ✅ To Do: only show test if its boolean is 1, no "Pending" text
-        function toggleVisibility(testKey, liId) {
-            const value = params.get(testKey);
-            const li = document.getElementById(liId);
-            li.style.display = (value === "1") ? "list-item" : "none";
-        }
+<script src="bootstrap.bundle.min.js"></script>
+<script>
+    const params = new URLSearchParams(window.location.search);
 
-        toggleVisibility("bloodTest", "liBloodTest");
-        toggleVisibility("urineTest", "liUrineTest");
-        toggleVisibility("rapidBloodSugarTest", "liRbst");
-        toggleVisibility("xRay", "liXRay");
-        toggleVisibility("bloodPressureTest", "liBPTest");
+    /* 1. SUMMARY PANEL */
+    const symptomLabels = {
+        fever:            "Fever",
+        cough:            "Cough",
+        headache:         "Headache",
+        urinaryHesitancy: "Urinary Hesitancy",
+        urinaryFrequency: "Urinary Frequency",
+        amenorrhea:       "Amenorrhea"
+    };
 
-        // Build symptoms text with duration for fever and cough
-        function buildSymptoms(symptomKeys) {
-            const labels = {
-                fever: "Fever",
-                cough: "Cough",
-                headache: "Headache",
-                urinaryHesitancy: "Urinary Hesitancy",
-                urinaryFrequency: "Urinary Frequency",
-                amenorrhea: "Amenorrhea"
-            };
+    if (params.get('name'))  document.getElementById('patientName').textContent  = decodeURIComponent(params.get('name'));
+    if (params.get('queue')) document.getElementById('queueNumber').textContent  = params.get('queue');
 
-            const found = symptomKeys
-                .filter(k => params.get(k) === "1")
-                .map(k => {
-                    if (k === "fever") {
-                        const d = parseInt(params.get("durationFever")) || 0;
-                        return `Fever (${d} days)`;
-                    }
-                    if (k === "cough") {
-                        const d = parseInt(params.get("durationCough")) || 0;
-                        return `Cough (${d} days)`;
-                    }
-                    return labels[k];
-                });
-
-            return found.length ? found.join(", ") : null;
-        }
-
-        // Update Doctor View row with correct consent logic
-        function updateDrView(testKey, consentKey, rowId, indicatorId, symptomsId, consentId, symptomKeys) {
-            const row = document.getElementById(rowId);
-            const indicator = document.getElementById(indicatorId);
-            const symptomsEl = document.getElementById(symptomsId);
-            const consentEl = document.getElementById(consentId);
-
-            const consentValue = params.get(consentKey);
-            const symptomText = buildSymptoms(symptomKeys);
-
-            if (!symptomText) {
-                row.style.display = "none";
-                return;
-            }
-
-            row.style.display = "flex";
-            symptomsEl.textContent = symptomText;
-
-            let finalConsent = "-";
-
-            // Fever → ≥3 days
-            if (testKey === "bloodTest") {
-                const d = parseInt(params.get("durationFever")) || 0;
-
-                if (d < 3) {
-                    finalConsent = "-";
-                } else {
-                    finalConsent = (consentValue === "1") ? "Consent" : "No Consent";
+    function buildSymptomsHTML() {
+        const parts = Object.keys(symptomLabels)
+            .filter(k => params.get(k) === "1")
+            .map(k => {
+                let label = symptomLabels[k];
+                let extra = "";
+                if (k === "fever") { const d = parseInt(params.get("durationFever")) || 0; extra = ` (${d} days)`; }
+                if (k === "cough") { const d = parseInt(params.get("durationCough")) || 0; extra = ` (${d} days)`; }
+                let consentNote = "";
+                if (k === "fever") {
+                    const d = parseInt(params.get("durationFever")) || 0;
+                    if (d >= 3) { consentNote = params.get("btConsent") === "1" ? " (Consent)" : " (No Consent)"; }
                 }
-            }
-            // Cough → ≥21 days
-            else if (testKey === "xRay") {
-                const d = parseInt(params.get("durationCough")) || 0;
+                return `<span style="display:inline-block;margin-right:10px;">${label}${extra}<span class="consent-tag">${consentNote}</span></span>`;
+            });
+        return parts.length ? parts.join("") : "—";
+    }
+    document.getElementById('symptomsDisplay').innerHTML = buildSymptomsHTML();
 
-                if (d < 21) {
-                    finalConsent = "-";
-                } else {
-                    finalConsent = (consentValue === "1") ? "Consent" : "No Consent";
-                }
-            }
-            // Headache → always "-"
-            else if (testKey === "bloodPressureTest") {
-                finalConsent = "";
-            }
-            // Other tests → consent boolean
-            else {
-                finalConsent = (consentValue === "1") ? "Consent" : "No Consent";
-            }
+    /* 2. NEXT STATION STEPPER */
+    const hasBlood = params.get("bloodTest") === "1";
+    const hasUrine = params.get("urineTest") === "1";
+    const hasRbst  = params.get("rapidBloodSugarTest") === "1";
+    const hasXRay  = params.get("xRay") === "1";
+    const hasBP    = params.get("bloodPressureTest") === "1";
 
-            consentEl.textContent = finalConsent;
+    const stationOrder = [];
+    if (hasBlood || hasUrine || hasRbst) stationOrder.push("stLab");
+    if (hasXRay)  stationOrder.push("stXRay");
+    if (hasBP)    stationOrder.push("stBP");
+    stationOrder.push("stDoctor");
+    stationOrder.push("stPharmacy");
 
-            // 🔵 / 🔴 Indicator logic
-            indicator.className = "indicator " + (finalConsent === "Consent" ? "blue" : "red");
-            if (testKey === "bloodPressureTest"){
-                indicator.className = "indicator blue";
-            }
+    stationOrder.forEach((id, idx) => {
+        const el  = document.getElementById(id);
+        const num = document.getElementById(id + "Num");
+        el.style.display = "flex";
+        if (num) num.textContent = idx + 1;
+        if (idx === 0) el.classList.add("current");
+    });
+
+    /* 3. MEDICAL TEST TABLE */
+    function buildSymptoms(keys) {
+        const found = keys.filter(k => params.get(k) === "1").map(k => {
+            if (k === "fever") return `Fever (${parseInt(params.get("durationFever")) || 0} days)`;
+            if (k === "cough") return `Cough (${parseInt(params.get("durationCough")) || 0} days)`;
+            return symptomLabels[k] || k;
+        });
+        return found.length ? found.join(", ") : null;
+    }
+
+    function updateDrView(testKey, consentKey, rowId, indicatorId, symptomsId, consentId, symptomKeys) {
+        const row        = document.getElementById(rowId);
+        const indicator  = document.getElementById(indicatorId);
+        const symptomsEl = document.getElementById(symptomsId);
+        const consentEl  = document.getElementById(consentId);
+
+        const symptomText = buildSymptoms(symptomKeys);
+        if (!symptomText) { row.style.display = "none"; return; }
+
+        row.style.display = "flex";
+        symptomsEl.textContent = symptomText;
+
+        let finalConsent = "-";
+        if (testKey === "bloodTest") {
+            const d = parseInt(params.get("durationFever")) || 0;
+            finalConsent = d < 3 ? "-" : (params.get(consentKey) === "1" ? "Consent" : "No Consent");
+        } else if (testKey === "xRay") {
+            const d = parseInt(params.get("durationCough")) || 0;
+            finalConsent = d < 21 ? "-" : (params.get(consentKey) === "1" ? "Consent" : "No Consent");
+        } else if (testKey === "bloodPressureTest") {
+            finalConsent = "";
+        } else {
+            finalConsent = params.get(consentKey) === "1" ? "Consent" : "No Consent";
         }
 
-        // Apply for each test
-        updateDrView(
-            "bloodTest",
-            "btConsent",
-            "bloodRow",
-            "bloodIndicator",
-            "bloodSymptoms",
-            "btConsent",
-            ["fever"]
-        );
+        consentEl.textContent = finalConsent;
+        indicator.className = "indicator " + (finalConsent === "Consent" ? "blue" : "red");
+        if (testKey === "bloodPressureTest") indicator.className = "indicator blue";
+    }
 
-        updateDrView(
-            "urineTest",
-            "utConsent",
-            "urineRow",
-            "urineIndicator",
-            "urineSymptoms",
-            "utConsent",
-            ["urinaryHesitancy", "amenorrhea"]
-        );
-
-        updateDrView(
-            "rapidBloodSugarTest",
-            "rbstConsent",
-            "rbstRow",
-            "rbstIndicator",
-            "rbstSymptoms",
-            "rbstConsent",
-            ["urinaryFrequency"]
-        );
-
-        updateDrView(
-            "xRay",
-            "xrConsent",
-            "xRayRow",
-            "xRayIndicator",
-            "xRaySymptoms",
-            "xrConsent",
-            ["cough"]
-        );
-
-        updateDrView(
-            "bloodPressureTest",
-            "bpConsent",
-            "bpRow",
-            "bpIndicator",
-            "bpSymptoms",
-            "bpConsent",
-            ["headache"]
-        );
-    </script>
-    </body>
+    updateDrView("bloodTest",          "btConsent",   "bloodRow","bloodIndicator","bloodSymptoms","btConsent",   ["fever"]);
+    updateDrView("urineTest",          "utConsent",   "urineRow","urineIndicator","urineSymptoms","utConsent",   ["urinaryHesitancy","amenorrhea"]);
+    updateDrView("rapidBloodSugarTest","rbstConsent", "rbstRow", "rbstIndicator", "rbstSymptoms", "rbstConsent", ["urinaryFrequency"]);
+    updateDrView("xRay",               "xrConsent",   "xRayRow", "xRayIndicator", "xRaySymptoms", "xrConsent",   ["cough"]);
+    updateDrView("bloodPressureTest",  "bpConsent",   "bpRow",   "bpIndicator",   "bpSymptoms",   "bpConsent",   ["headache"]);
+</script>
+</body>
 </html>
