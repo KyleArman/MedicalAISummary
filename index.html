@@ -141,6 +141,15 @@
             font-size: 1rem;
             font-weight: 700;
         }
+        .next-station .station-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
         .next-station .station-info { flex: 1; }
         .next-station .station-name { color: var(--deep-blue); font-weight: 600; font-size: 0.95rem; }
         .next-station .station-sub  { color: var(--muted-blue); font-size: 0.8rem; margin-top: 2px; }
@@ -185,6 +194,9 @@
         .indicator { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
         .indicator.blue { background-color: var(--accent-blue); box-shadow: 0 0 6px rgba(14, 165, 233, 0.5); }
         .indicator.red  { background-color: var(--danger); box-shadow: 0 0 6px rgba(214, 69, 69, 0.4); }
+
+        /* Symptoms with no associated test (e.g. headache) still get a plain row */
+        .test-card.no-test .test-detail.consent-row { display: none; }
     </style>
 </head>
 <body>
@@ -193,8 +205,8 @@
 
     <!-- MAP -->
     <div class="map-card">
-        <h4>UTM Health Center Map</h4>
-        <img src="PKUMap.png" alt="PKU Map">
+        <h4>PKU SUMMARY PAGE</h4>
+        <img src="PKUMap.jpg" alt="PKU Map">
     </div>
 
     <!-- PATIENT OVERVIEW (name / queue / symptoms at a glance) -->
@@ -217,7 +229,13 @@
     <div class="section-card">
         <p class="section-title">Next Station</p>
         <div class="next-station" id="nextStationDisplay">
-            <div class="station-icon">&#9654;</div>
+            <div class="station-icon">
+                <!-- Location-pin icon: points the patient to where they need to go next -->
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 21s-7-7.2-7-12a7 7 0 0 1 14 0c0 4.8-7 12-7 12z"/>
+                    <circle cx="12" cy="9" r="2.5"/>
+                </svg>
+            </div>
             <div class="station-info">
                 <div class="station-name" id="nextStationName">—</div>
                 <div class="station-sub" id="nextStationSub">—</div>
@@ -226,7 +244,14 @@
         </div>
     </div>
 
-    <!-- PATIENT SUMMARY (renamed from "Medical Test Summary") -->
+    <!-- PATIENT SUMMARY -->
+    <!-- Only the four tests that ModelManager.cs actually drives are listed here:
+         Blood Test (fever > 3 days), Urine Test (urinary hesitancy / amenorrhea),
+         Rapid Blood Sugar Test (frequent urination), and X-Ray (cough >= 21 days).
+         There is no "blood pressure test" concept anywhere in ModelManager.cs, so that
+         row has been removed rather than being shown for headache, which the app
+         tracks as a symptom with no associated test or consent (see
+         BuildSymptomSummaryText / FormatSymptomLine in ModelManager.cs). -->
     <div class="section-card">
         <p class="section-title">Patient Summary</p>
 
@@ -266,13 +291,15 @@
             <div class="test-detail"><span class="detail-label">Consent</span><span class="detail-value" id="xrConsent"></span></div>
         </div>
 
-        <div class="test-card" id="bpRow">
+        <!-- Symptoms with no test attached to them (currently: headache) get their own
+             plain card, shown only when present, with no consent row — matching
+             ModelManager.cs's FormatSymptomLine("Headache", null, null). -->
+        <div class="test-card no-test" id="headacheRow">
             <div class="test-card-header">
-                <span id="bpIndicator" class="indicator blue"></span>
-                <span class="test-name">Blood Pressure Test</span>
+                <span id="headacheIndicator" class="indicator blue"></span>
+                <span class="test-name">Headache</span>
             </div>
-            <div class="test-detail"><span class="detail-label">Symptoms</span><span class="detail-value" id="bpSymptoms"></span></div>
-            <div class="test-detail"><span class="detail-label">Consent</span><span class="detail-value" id="bpConsent"></span></div>
+            <div class="test-detail consent-row" style="display:none;"></div>
         </div>
 
     </div>
@@ -305,9 +332,16 @@
                 if (k === "fever") { const d = parseInt(params.get("durationFever")) || 0; extra = ` (${d} days)`; }
                 if (k === "cough") { const d = parseInt(params.get("durationCough")) || 0; extra = ` (${d} days)`; }
                 let consentNote = "";
+                // ModelManager.cs: askbloodTest is only set when durationFever > 3 (strictly
+                // greater), so a consent tag should only appear once that threshold is crossed.
                 if (k === "fever") {
                     const d = parseInt(params.get("durationFever")) || 0;
-                    if (d >= 3) { consentNote = params.get("btConsent") === "1" ? " (Consent)" : " (No Consent)"; }
+                    if (d > 3) { consentNote = params.get("btConsent") === "1" ? " (Consent)" : " (No Consent)"; }
+                }
+                // ModelManager.cs: askxRay is set when durationCough >= 21.
+                if (k === "cough") {
+                    const d = parseInt(params.get("durationCough")) || 0;
+                    if (d >= 21) { consentNote = params.get("xrConsent") === "1" ? " (Consent)" : " (No Consent)"; }
                 }
                 return `<span style="display:inline-block;margin-right:10px;">${label}${extra}<span class="consent-tag">${consentNote}</span></span>`;
             });
@@ -315,19 +349,17 @@
     }
     document.getElementById('symptomsDisplay').innerHTML = buildSymptomsHTML();
 
-    /* 2. NEXT STATION — determine the full priority order internally (same
-       priority as before: lab tests -> X-ray -> BP -> doctor -> pharmacy),
-       but only DISPLAY the single next stop, not the whole route. */
+    /* 2. NEXT STATION — determine the full priority order internally (lab tests ->
+       X-ray -> doctor -> pharmacy, matching the four tests ModelManager.cs actually
+       drives), but only DISPLAY the single next stop, not the whole route. */
     const hasBlood = params.get("bloodTest") === "1";
     const hasUrine = params.get("urineTest") === "1";
     const hasRbst  = params.get("rapidBloodSugarTest") === "1";
     const hasXRay  = params.get("xRay") === "1";
-    const hasBP    = params.get("bloodPressureTest") === "1";
 
     const stationDefs = {
         stLab:      { name: "Lab Sample Counter",             sub: "Blood Test \u00b7 Urine Test \u00b7 Rapid Blood Sugar Test" },
         stXRay:     { name: "Diagnostic Laboratory",          sub: "X-Ray" },
-        stBP:       { name: "Doctor's Room",                  sub: "Blood Pressure Test" },
         stDoctor:   { name: "Doctor's Consultation Room",     sub: "See the Doctor" },
         stPharmacy: { name: "Pharmacy Counter",               sub: "Collect Prescribed Medicine" }
     };
@@ -335,7 +367,6 @@
     const stationOrder = [];
     if (hasBlood || hasUrine || hasRbst) stationOrder.push("stLab");
     if (hasXRay)  stationOrder.push("stXRay");
-    if (hasBP)    stationOrder.push("stBP");
     stationOrder.push("stDoctor");
     stationOrder.push("stPharmacy");
 
@@ -354,7 +385,7 @@
         locEl.style.display = "block";
     }
 
-    /* 3. PATIENT SUMMARY TABLE (test rows) */
+    /* 3. PATIENT SUMMARY (test rows) */
     function buildSymptoms(keys) {
         const found = keys.filter(k => params.get(k) === "1").map(k => {
             if (k === "fever") return `Fever (${parseInt(params.get("durationFever")) || 0} days)`;
@@ -378,27 +409,39 @@
 
         let finalConsent = "-";
         if (testKey === "bloodTest") {
+            // ModelManager.cs: askbloodTest only fires when durationFever > 3, so a
+            // duration of exactly 3 days (or less) never reached the consent question.
             const d = parseInt(params.get("durationFever")) || 0;
-            finalConsent = d < 3 ? "-" : (params.get(consentKey) === "1" ? "Consent" : "No Consent");
+            finalConsent = d <= 3 ? "-" : (params.get(consentKey) === "1" ? "Consent" : "No Consent");
         } else if (testKey === "xRay") {
+            // ModelManager.cs: askxRay fires when durationCough >= 21.
             const d = parseInt(params.get("durationCough")) || 0;
             finalConsent = d < 21 ? "-" : (params.get(consentKey) === "1" ? "Consent" : "No Consent");
-        } else if (testKey === "bloodPressureTest") {
-            finalConsent = "";
         } else {
+            // Urine test and rapid blood sugar test have no duration threshold in
+            // ModelManager.cs — consent is asked as soon as the triggering symptom appears.
             finalConsent = params.get(consentKey) === "1" ? "Consent" : "No Consent";
         }
 
         consentEl.textContent = finalConsent;
         indicator.className = "indicator " + (finalConsent === "Consent" ? "blue" : "red");
-        if (testKey === "bloodPressureTest") indicator.className = "indicator blue";
     }
 
     updateDrView("bloodTest",          "btConsent",   "bloodRow","bloodIndicator","bloodSymptoms","btConsent",   ["fever"]);
     updateDrView("urineTest",          "utConsent",   "urineRow","urineIndicator","urineSymptoms","utConsent",   ["urinaryHesitancy","amenorrhea"]);
     updateDrView("rapidBloodSugarTest","rbstConsent", "rbstRow", "rbstIndicator", "rbstSymptoms", "rbstConsent", ["urinaryFrequency"]);
     updateDrView("xRay",               "xrConsent",   "xRayRow", "xRayIndicator", "xRaySymptoms", "xrConsent",   ["cough"]);
-    updateDrView("bloodPressureTest",  "bpConsent",   "bpRow",   "bpIndicator",   "bpSymptoms",   "bpConsent",   ["headache"]);
+
+    // Headache has no associated test in ModelManager.cs (BuildSymptomSummaryText adds it
+    // with no duration and no consent) — show its own plain card, no consent lookup.
+    (function updateHeadacheView() {
+        const row = document.getElementById('headacheRow');
+        if (params.get('headache') === "1") {
+            row.style.display = "flex";
+        } else {
+            row.style.display = "none";
+        }
+    })();
 </script>
 </body>
 </html>
