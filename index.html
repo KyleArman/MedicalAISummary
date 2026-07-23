@@ -9,11 +9,25 @@
     <style>
         * { box-sizing: border-box; }
 
+        :root {
+            --bg: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: #dce6f5;
+            --card-shadow: 0 4px 20px rgba(15, 61, 115, 0.08);
+            --navy: #0f2942;
+            --deep-blue: #0f3d73;
+            --royal-blue: #1e5fa8;
+            --accent-blue: #0ea5e9;
+            --muted-blue: #6b8aad;
+            --divider-blue: #cfe0f5;
+            --danger: #d64545;
+        }
+
         body {
             font-family: 'Inter', Arial, sans-serif;
             margin: 0;
             padding: 12px;
-            background-color: #1a1a2e;
+            background-color: var(--bg);
             min-height: 100vh;
         }
 
@@ -24,14 +38,15 @@
 
         /* MAP CARD */
         .map-card {
-            background: #16213e;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
             border-radius: 12px;
             padding: 14px;
             margin-bottom: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            box-shadow: var(--card-shadow);
         }
         .map-card h4 {
-            color: #00d4ff;
+            color: var(--deep-blue);
             font-size: 1rem;
             font-weight: 600;
             text-align: center;
@@ -42,22 +57,23 @@
 
         /* SUMMARY PANEL */
         .summary-panel {
-            background: #2b2b3b;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
             border-radius: 10px;
             overflow: hidden;
             margin-bottom: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            box-shadow: var(--card-shadow);
         }
         .summary-row {
             display: flex;
             align-items: flex-start;
-            border-bottom: 2px solid #00cfff;
+            border-bottom: 1px solid var(--divider-blue);
             padding: 10px 14px;
             gap: 10px;
         }
         .summary-row:last-child { border-bottom: none; }
         .summary-label {
-            color: #00cfff;
+            color: var(--royal-blue);
             font-weight: 600;
             font-size: 0.9rem;
             min-width: 130px;
@@ -65,29 +81,29 @@
             padding-top: 2px;
         }
         .summary-value {
-            color: #e8e8f0;
+            color: var(--navy);
             font-size: 0.9rem;
             font-weight: 500;
             flex: 1;
             line-height: 1.6;
         }
         .consent-tag {
-            color: #aaaacc;
+            color: var(--muted-blue);
             font-size: 0.8rem;
             font-weight: 400;
         }
 
-        /* NEXT STATION */
+        /* SECTION CARD (shared by Next Station + Patient Summary) */
         .section-card {
-            background: #16213e;
+            background: var(--card-bg);
             border-radius: 12px;
             padding: 14px 16px;
             margin-bottom: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-            border: 1px solid rgba(0,207,255,0.2);
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--card-border);
         }
         .section-title {
-            color: #00cfff;
+            color: var(--deep-blue);
             font-size: 1rem;
             font-weight: 700;
             margin: 0 0 14px 0;
@@ -101,81 +117,58 @@
             display: inline-block;
             width: 4px;
             height: 18px;
-            background: #00cfff;
+            background: var(--accent-blue);
             border-radius: 2px;
         }
 
-        /* Stepper */
-        .station-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            position: relative;
-        }
-        .station-list::before {
-            content: '';
-            position: absolute;
-            left: 14px;
-            top: 20px;
-            bottom: 20px;
-            width: 2px;
-            background: rgba(0,207,255,0.15);
-        }
-        .station-item {
-            display: none;
+        /* NEXT STATION — single destination card (not a multi-step list) */
+        .next-station {
+            display: flex;
             align-items: center;
             gap: 14px;
-            padding: 9px 0;
-            position: relative;
         }
-        .station-item.always { display: flex; }
-        .station-icon {
-            width: 30px;
-            height: 30px;
+        .next-station .station-icon {
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
-            background: rgba(0,207,255,0.1);
-            border: 2px solid #00cfff;
+            background: linear-gradient(135deg, var(--royal-blue), var(--accent-blue));
+            color: #ffffff;
+            box-shadow: 0 3px 10px rgba(14, 165, 233, 0.4);
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            font-size: 0.75rem;
+            font-size: 1rem;
             font-weight: 700;
-            color: #00cfff;
-            z-index: 1;
         }
-        .station-info { flex: 1; }
-        .station-name { color: #e8e8f0; font-weight: 600; font-size: 0.88rem; }
-        .station-sub  { color: #7777a0; font-size: 0.78rem; margin-top: 1px; }
-
-        /* Current (first) station highlight */
-        .station-item.current .station-icon {
-            background: #00cfff;
-            color: #16213e;
-            box-shadow: 0 0 12px rgba(0,207,255,0.55);
+        .next-station .station-info { flex: 1; }
+        .next-station .station-name { color: var(--deep-blue); font-weight: 600; font-size: 0.95rem; }
+        .next-station .station-sub  { color: var(--muted-blue); font-size: 0.8rem; margin-top: 2px; }
+        .next-station .station-location {
+            color: var(--muted-blue);
+            font-size: 0.78rem;
+            margin-top: 4px;
         }
-        .station-item.current .station-name { color: #00cfff; }
-        .station-item.current .station-sub  { color: rgba(0,207,255,0.7); }
 
-        /* DOCTOR TABLE */
+        /* PATIENT SUMMARY TABLE (formerly "Medical Test Summary") */
         .dr-row {
             display: flex;
             flex-wrap: wrap;
             padding: 8px 4px;
             font-size: 0.85rem;
-            border-bottom: 1px solid rgba(0,207,255,0.08);
+            border-bottom: 1px solid var(--divider-blue);
             align-items: center;
         }
         .dr-row:last-child { border-bottom: none; }
         .dr-row div { padding: 2px 4px; }
-        .col-test      { flex: 28%; color: #c8c8e0; font-weight: 500; }
+        .col-test      { flex: 28%; color: var(--navy); font-weight: 500; }
         .col-indicator { flex: 10%; text-align: center; }
-        .col-symptom   { flex: 38%; color: #9999b8; }
-        .col-consent   { flex: 24%; color: #9999b8; font-size: 0.8rem; }
+        .col-symptom   { flex: 38%; color: var(--muted-blue); }
+        .col-consent   { flex: 24%; color: var(--muted-blue); font-size: 0.8rem; }
         .fw-header .col-test,
         .fw-header .col-symptom,
         .fw-header .col-consent {
-            color: rgba(0,207,255,0.6);
+            color: var(--royal-blue);
             font-size: 0.78rem;
             font-weight: 600;
             text-transform: uppercase;
@@ -188,8 +181,8 @@
         }
 
         .indicator { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
-        .indicator.blue { background-color: #00cfff; box-shadow: 0 0 6px rgba(0,207,255,0.65); }
-        .indicator.red  { background-color: #ff4d6d; box-shadow: 0 0 6px rgba(255,77,109,0.55); }
+        .indicator.blue { background-color: var(--accent-blue); box-shadow: 0 0 6px rgba(14, 165, 233, 0.5); }
+        .indicator.red  { background-color: var(--danger); box-shadow: 0 0 6px rgba(214, 69, 69, 0.4); }
     </style>
 </head>
 <body>
@@ -202,7 +195,7 @@
         <img src="PKUMap.png" alt="PKU Map">
     </div>
 
-    <!-- PATIENT SUMMARY PANEL -->
+    <!-- PATIENT OVERVIEW (name / queue / symptoms at a glance) -->
     <div class="summary-panel" id="summaryPanel">
         <div class="summary-row">
             <span class="summary-label">Name:</span>
@@ -218,61 +211,26 @@
         </div>
     </div>
 
-    <!-- NEXT STATION -->
+    <!-- NEXT STATION — shows only the single place the patient needs to go next -->
     <div class="section-card">
         <p class="section-title">Next Station</p>
-        <ul class="station-list" id="stationList">
-
-            <li class="station-item" id="stLab">
-                <div class="station-icon" id="stLabNum"></div>
-                <div class="station-info">
-                    <div class="station-name">Lab Sample Counter</div>
-                    <div class="station-sub">Blood Test &middot; Urine Test &middot; Rapid Blood Sugar Test</div>
-                </div>
-            </li>
-
-            <li class="station-item" id="stXRay">
-                <div class="station-icon" id="stXRayNum"></div>
-                <div class="station-info">
-                    <div class="station-name">Diagnostic Laboratory</div>
-                    <div class="station-sub">X-Ray</div>
-                </div>
-            </li>
-
-            <li class="station-item" id="stBP">
-                <div class="station-icon" id="stBPNum"></div>
-                <div class="station-info">
-                    <div class="station-name">Doctor's Room</div>
-                    <div class="station-sub">Blood Pressure Test</div>
-                </div>
-            </li>
-
-            <li class="station-item always" id="stDoctor">
-                <div class="station-icon" id="stDoctorNum"></div>
-                <div class="station-info">
-                    <div class="station-name">Doctor's Consultation Room</div>
-                    <div class="station-sub">See the Doctor</div>
-                </div>
-            </li>
-
-            <li class="station-item always" id="stPharmacy">
-                <div class="station-icon" id="stPharmacyNum"></div>
-                <div class="station-info">
-                    <div class="station-name">Pharmacy Counter</div>
-                    <div class="station-sub">Collect Prescribed Medicine</div>
-                </div>
-            </li>
-
-        </ul>
+        <div class="next-station" id="nextStationDisplay">
+            <div class="station-icon">&#9654;</div>
+            <div class="station-info">
+                <div class="station-name" id="nextStationName">—</div>
+                <div class="station-sub" id="nextStationSub">—</div>
+                <div class="station-location" id="nextStationLocation" style="display:none;"></div>
+            </div>
+        </div>
     </div>
 
-    <!-- MEDICAL TEST SUMMARY (always visible, no Doctor View button) -->
+    <!-- PATIENT SUMMARY (renamed from "Medical Test Summary") -->
     <div class="section-card">
-        <p class="section-title">Medical Test Summary</p>
+        <p class="section-title">Patient Summary</p>
 
         <div class="dr-row fw-header">
             <div class="col-test">Medical Test</div>
-            <div class="col-indicator" style="color:rgba(0,207,255,0.6);font-size:0.78rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Status</div>
+            <div class="col-indicator" style="color:var(--royal-blue);font-size:0.78rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Status</div>
             <div class="col-symptom">Symptoms</div>
             <div class="col-consent">Consent</div>
         </div>
@@ -320,7 +278,7 @@
 <script>
     const params = new URLSearchParams(window.location.search);
 
-    /* 1. SUMMARY PANEL */
+    /* 1. PATIENT OVERVIEW PANEL */
     const symptomLabels = {
         fever:            "Fever",
         cough:            "Cough",
@@ -352,12 +310,22 @@
     }
     document.getElementById('symptomsDisplay').innerHTML = buildSymptomsHTML();
 
-    /* 2. NEXT STATION STEPPER */
+    /* 2. NEXT STATION — determine the full priority order internally (same
+       priority as before: lab tests -> X-ray -> BP -> doctor -> pharmacy),
+       but only DISPLAY the single next stop, not the whole route. */
     const hasBlood = params.get("bloodTest") === "1";
     const hasUrine = params.get("urineTest") === "1";
     const hasRbst  = params.get("rapidBloodSugarTest") === "1";
     const hasXRay  = params.get("xRay") === "1";
     const hasBP    = params.get("bloodPressureTest") === "1";
+
+    const stationDefs = {
+        stLab:      { name: "Lab Sample Counter",             sub: "Blood Test \u00b7 Urine Test \u00b7 Rapid Blood Sugar Test" },
+        stXRay:     { name: "Diagnostic Laboratory",          sub: "X-Ray" },
+        stBP:       { name: "Doctor's Room",                  sub: "Blood Pressure Test" },
+        stDoctor:   { name: "Doctor's Consultation Room",     sub: "See the Doctor" },
+        stPharmacy: { name: "Pharmacy Counter",               sub: "Collect Prescribed Medicine" }
+    };
 
     const stationOrder = [];
     if (hasBlood || hasUrine || hasRbst) stationOrder.push("stLab");
@@ -366,15 +334,22 @@
     stationOrder.push("stDoctor");
     stationOrder.push("stPharmacy");
 
-    stationOrder.forEach((id, idx) => {
-        const el  = document.getElementById(id);
-        const num = document.getElementById(id + "Num");
-        el.style.display = "flex";
-        if (num) num.textContent = idx + 1;
-        if (idx === 0) el.classList.add("current");
-    });
+    const nextKey = stationOrder[0];
+    const nextStation = stationDefs[nextKey];
 
-    /* 3. MEDICAL TEST TABLE */
+    document.getElementById('nextStationName').textContent = nextStation.name;
+    document.getElementById('nextStationSub').textContent = nextStation.sub;
+
+    // Optional: if a location/room identifier is present (e.g. from OPD auto-assignment),
+    // show it under the station name. Degrades gracefully if the param isn't present.
+    const locationParam = params.get('location');
+    if (locationParam) {
+        const locEl = document.getElementById('nextStationLocation');
+        locEl.textContent = "Location: " + decodeURIComponent(locationParam);
+        locEl.style.display = "block";
+    }
+
+    /* 3. PATIENT SUMMARY TABLE (test rows) */
     function buildSymptoms(keys) {
         const found = keys.filter(k => params.get(k) === "1").map(k => {
             if (k === "fever") return `Fever (${parseInt(params.get("durationFever")) || 0} days)`;
