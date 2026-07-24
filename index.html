@@ -154,14 +154,13 @@
         .next-station .station-name { color: var(--deep-blue); font-weight: 600; font-size: 0.95rem; }
         .next-station .station-sub  { color: var(--muted-blue); font-size: 0.8rem; margin-top: 2px; }
 
-        /* PATIENT SUMMARY — each test as a stacked, centered card (name+status on top,
-           symptoms and consent centered underneath) instead of a side-by-side table
-           layout or left-aligned block. */
+        /* PATIENT SUMMARY — each test as a stacked, left-aligned card (name+status on top,
+           symptoms and consent left-aligned underneath). */
         .test-card {
             display: none; /* JS sets to "flex" (with flex-direction: column below) when applicable */
             flex-direction: column;
-            align-items: center;
-            text-align: center;
+            align-items: flex-start;
+            text-align: left;
             gap: 6px;
             padding: 16px 8px;
             border-bottom: 1px solid var(--divider-blue);
@@ -170,13 +169,13 @@
         .test-card-header {
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             gap: 8px;
         }
         .test-name { color: var(--navy); font-weight: 600; font-size: 0.92rem; }
         .test-detail {
             display: flex;
-            justify-content: center;
+            justify-content: flex-start;
             gap: 8px;
             font-size: 0.85rem;
         }
