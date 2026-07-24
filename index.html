@@ -247,7 +247,7 @@
 
         <div class="test-card" id="bloodRow">
             <div class="test-card-header">
-                <span class="test-name">Blood Test</span>
+                <span class="test-name" id="bloodTestName">Blood Test</span>
             </div>
             <div class="test-detail"><span class="detail-label">Symptoms</span><span class="detail-value" id="bloodSymptoms"></span></div>
             <div class="test-detail" id="bloodConsentDetail"><span class="detail-label">Consent</span><span class="detail-value" id="btConsent"></span></div>
@@ -271,7 +271,7 @@
 
         <div class="test-card" id="xRayRow">
             <div class="test-card-header">
-                <span class="test-name">X-Ray</span>
+                <span class="test-name" id="xRayTestName">X-Ray</span>
             </div>
             <div class="test-detail"><span class="detail-label">Symptoms</span><span class="detail-value" id="xRaySymptoms"></span></div>
             <div class="test-detail" id="xRayConsentDetail"><span class="detail-label">Consent</span><span class="detail-value" id="xrConsent"></span></div>
@@ -371,10 +371,12 @@
         return found.length ? found.join(", ") : null;
     }
 
-    function updateDrView(testKey, consentKey, rowId, symptomsId, consentId, symptomKeys) {
-        const row        = document.getElementById(rowId);
-        const symptomsEl = document.getElementById(symptomsId);
-        const consentEl  = document.getElementById(consentId);
+    function updateDrView(testKey, consentKey, rowId, symptomsId, consentId, symptomKeys, consentDetailId, nameId) {
+        const row           = document.getElementById(rowId);
+        const symptomsEl    = document.getElementById(symptomsId);
+        const consentEl     = document.getElementById(consentId);
+        const consentDetail = consentDetailId ? document.getElementById(consentDetailId) : null;
+        const nameEl        = nameId ? document.getElementById(nameId) : null;
 
         const symptomText = buildSymptoms(symptomKeys);
         if (!symptomText) { row.style.display = "none"; return; }
@@ -382,33 +384,46 @@
         row.style.display = "flex";
         symptomsEl.textContent = symptomText;
 
-        let finalConsent;
+        // "shown" controls whether the consent row is displayed at all; when false the
+        // whole detail row is hidden (previous behaviour), and "(No need)" is shown
+        // beside the test name instead.
+        let shown = true;
+        let finalConsent = "";
 
         if (testKey === "bloodTest") {
             // Blood test is only actually needed once the fever has lasted more than 3 days.
             const d = parseInt(params.get("durationFever")) || 0;
-            finalConsent = d > 3
-                ? (params.get(consentKey) === "1" ? "Consent" : "No Consent")
-                : "(No need)";
+            shown = d > 3;
+            if (shown) finalConsent = params.get(consentKey) === "1" ? "Consent" : "No Consent";
         } else if (testKey === "xRay") {
             // X-Ray is only actually needed once the cough has lasted more than 20 days.
             const d = parseInt(params.get("durationCough")) || 0;
-            finalConsent = d > 20
-                ? (params.get(consentKey) === "1" ? "Consent" : "No Consent")
-                : "(No need)";
+            shown = d > 20;
+            if (shown) finalConsent = params.get(consentKey) === "1" ? "Consent" : "No Consent";
         } else {
             // Urine test and rapid blood sugar test have no duration threshold —
             // consent is always relevant once the triggering symptom appears.
             finalConsent = params.get(consentKey) === "1" ? "Consent" : "No Consent";
         }
 
+        if (nameEl) {
+            nameEl.textContent = nameEl.textContent.replace(" (No need)", "");
+            if (!shown) nameEl.textContent += " (No need)";
+        }
+
+        if (!shown) {
+            if (consentDetail) consentDetail.style.display = "none";
+            return;
+        }
+
+        if (consentDetail) consentDetail.style.display = "flex";
         consentEl.textContent = finalConsent;
     }
 
-    updateDrView("bloodTest",          "btConsent",   "bloodRow","bloodSymptoms","btConsent",   ["fever"]);
+    updateDrView("bloodTest",          "btConsent",   "bloodRow","bloodSymptoms","btConsent",   ["fever"], "bloodConsentDetail", "bloodTestName");
     updateDrView("urineTest",          "utConsent",   "urineRow","urineSymptoms","utConsent",   ["urinaryHesitancy","amenorrhea"]);
     updateDrView("rapidBloodSugarTest","rbstConsent", "rbstRow", "rbstSymptoms", "rbstConsent", ["urinaryFrequency"]);
-    updateDrView("xRay",               "xrConsent",   "xRayRow", "xRaySymptoms", "xrConsent",   ["cough"]);
+    updateDrView("xRay",               "xrConsent",   "xRayRow", "xRaySymptoms", "xrConsent",   ["cough"], "xRayConsentDetail", "xRayTestName");
 
     // Headache has no associated test in ModelManager.cs (BuildSymptomSummaryText adds it
     // with no duration and no consent) — show its own plain card, no consent lookup.
