@@ -261,7 +261,7 @@
                 <span class="test-name">Blood Test</span>
             </div>
             <div class="test-detail"><span class="detail-label">Symptoms</span><span class="detail-value" id="bloodSymptoms"></span></div>
-            <div class="test-detail"><span class="detail-label">Consent</span><span class="detail-value" id="btConsent"></span></div>
+            <div class="test-detail" id="bloodConsentDetail"><span class="detail-label">Consent</span><span class="detail-value" id="btConsent"></span></div>
         </div>
 
         <div class="test-card" id="urineRow">
@@ -288,7 +288,7 @@
                 <span class="test-name">X-Ray</span>
             </div>
             <div class="test-detail"><span class="detail-label">Symptoms</span><span class="detail-value" id="xRaySymptoms"></span></div>
-            <div class="test-detail"><span class="detail-label">Consent</span><span class="detail-value" id="xrConsent"></span></div>
+            <div class="test-detail" id="xRayConsentDetail"><span class="detail-label">Consent</span><span class="detail-value" id="xrConsent"></span></div>
         </div>
 
         <!-- Symptoms with no test attached to them (currently: headache) get their own
@@ -332,16 +332,16 @@
                 if (k === "fever") { const d = parseInt(params.get("durationFever")) || 0; extra = ` (${d} days)`; }
                 if (k === "cough") { const d = parseInt(params.get("durationCough")) || 0; extra = ` (${d} days)`; }
                 let consentNote = "";
-                // ModelManager.cs: askbloodTest is only set when durationFever > 3 (strictly
-                // greater), so a consent tag should only appear once that threshold is crossed.
+                // Fever: only show a consent tag once the fever has lasted more than 3 days.
+                // Otherwise it's omitted entirely (not shown as blank/dash).
                 if (k === "fever") {
                     const d = parseInt(params.get("durationFever")) || 0;
                     if (d > 3) { consentNote = params.get("btConsent") === "1" ? " (Consent)" : " (No Consent)"; }
                 }
-                // ModelManager.cs: askxRay is set when durationCough >= 21.
+                // Cough: only show a consent tag once the cough has lasted more than 20 days.
                 if (k === "cough") {
                     const d = parseInt(params.get("durationCough")) || 0;
-                    if (d >= 21) { consentNote = params.get("xrConsent") === "1" ? " (Consent)" : " (No Consent)"; }
+                    if (d > 20) { consentNote = params.get("xrConsent") === "1" ? " (Consent)" : " (No Consent)"; }
                 }
                 return `<span style="display:inline-block;margin-right:10px;">${label}${extra}<span class="consent-tag">${consentNote}</span></span>`;
             });
@@ -395,11 +395,12 @@
         return found.length ? found.join(", ") : null;
     }
 
-    function updateDrView(testKey, consentKey, rowId, indicatorId, symptomsId, consentId, symptomKeys) {
-        const row        = document.getElementById(rowId);
-        const indicator  = document.getElementById(indicatorId);
-        const symptomsEl = document.getElementById(symptomsId);
-        const consentEl  = document.getElementById(consentId);
+    function updateDrView(testKey, consentKey, rowId, indicatorId, symptomsId, consentId, symptomKeys, consentDetailId) {
+        const row           = document.getElementById(rowId);
+        const indicator     = document.getElementById(indicatorId);
+        const symptomsEl    = document.getElementById(symptomsId);
+        const consentEl     = document.getElementById(consentId);
+        const consentDetail = consentDetailId ? document.getElementById(consentDetailId) : null;
 
         const symptomText = buildSymptoms(symptomKeys);
         if (!symptomText) { row.style.display = "none"; return; }
@@ -407,30 +408,42 @@
         row.style.display = "flex";
         symptomsEl.textContent = symptomText;
 
-        let finalConsent = "-";
+        // "shown" controls whether the consent row is displayed at all; when false the
+        // whole detail row is hidden rather than showing a placeholder like "-".
+        let shown = true;
+        let finalConsent = "";
+
         if (testKey === "bloodTest") {
-            // ModelManager.cs: askbloodTest only fires when durationFever > 3, so a
-            // duration of exactly 3 days (or less) never reached the consent question.
+            // Only show consent once the fever has lasted more than 3 days.
             const d = parseInt(params.get("durationFever")) || 0;
-            finalConsent = d <= 3 ? "-" : (params.get(consentKey) === "1" ? "Consent" : "No Consent");
+            shown = d > 3;
+            if (shown) finalConsent = params.get(consentKey) === "1" ? "Consent" : "No Consent";
         } else if (testKey === "xRay") {
-            // ModelManager.cs: askxRay fires when durationCough >= 21.
+            // Only show consent once the cough has lasted more than 20 days.
             const d = parseInt(params.get("durationCough")) || 0;
-            finalConsent = d < 21 ? "-" : (params.get(consentKey) === "1" ? "Consent" : "No Consent");
+            shown = d > 20;
+            if (shown) finalConsent = params.get(consentKey) === "1" ? "Consent" : "No Consent";
         } else {
-            // Urine test and rapid blood sugar test have no duration threshold in
-            // ModelManager.cs — consent is asked as soon as the triggering symptom appears.
+            // Urine test and rapid blood sugar test have no duration threshold —
+            // consent is always relevant once the triggering symptom appears.
             finalConsent = params.get(consentKey) === "1" ? "Consent" : "No Consent";
         }
 
+        if (!shown) {
+            if (consentDetail) consentDetail.style.display = "none";
+            indicator.className = "indicator";
+            return;
+        }
+
+        if (consentDetail) consentDetail.style.display = "flex";
         consentEl.textContent = finalConsent;
         indicator.className = "indicator " + (finalConsent === "Consent" ? "blue" : "red");
     }
 
-    updateDrView("bloodTest",          "btConsent",   "bloodRow","bloodIndicator","bloodSymptoms","btConsent",   ["fever"]);
+    updateDrView("bloodTest",          "btConsent",   "bloodRow","bloodIndicator","bloodSymptoms","btConsent",   ["fever"], "bloodConsentDetail");
     updateDrView("urineTest",          "utConsent",   "urineRow","urineIndicator","urineSymptoms","utConsent",   ["urinaryHesitancy","amenorrhea"]);
     updateDrView("rapidBloodSugarTest","rbstConsent", "rbstRow", "rbstIndicator", "rbstSymptoms", "rbstConsent", ["urinaryFrequency"]);
-    updateDrView("xRay",               "xrConsent",   "xRayRow", "xRayIndicator", "xRaySymptoms", "xrConsent",   ["cough"]);
+    updateDrView("xRay",               "xrConsent",   "xRayRow", "xRayIndicator", "xRaySymptoms", "xrConsent",   ["cough"], "xRayConsentDetail");
 
     // Headache has no associated test in ModelManager.cs (BuildSymptomSummaryText adds it
     // with no duration and no consent) — show its own plain card, no consent lookup.
