@@ -87,11 +87,6 @@
             flex: 1;
             line-height: 1.6;
         }
-        .consent-tag {
-            color: var(--muted-blue);
-            font-size: 0.8rem;
-            font-weight: 400;
-        }
 
         /* SECTION CARD (shared by Next Station + Patient Summary) */
         .section-card {
@@ -199,7 +194,7 @@
         <img src="PKUMap.jpg" alt="PKU Map">
     </div>
 
-    <!-- PATIENT OVERVIEW (name / queue / symptoms at a glance) -->
+    <!-- PATIENT OVERVIEW (name / queue at a glance) -->
     <div class="summary-panel" id="summaryPanel">
         <div class="summary-row">
             <span class="summary-label">Name:</span>
@@ -208,10 +203,6 @@
         <div class="summary-row">
             <span class="summary-label">Queue Number:</span>
             <span class="summary-value" id="queueNumber">—</span>
-        </div>
-        <div class="summary-row">
-            <span class="summary-label">Symptoms:</span>
-            <span class="summary-value" id="symptomsDisplay">—</span>
         </div>
     </div>
 
@@ -306,32 +297,6 @@
 
     if (params.get('name'))  document.getElementById('patientName').textContent  = decodeURIComponent(params.get('name'));
     if (params.get('queue')) document.getElementById('queueNumber').textContent  = params.get('queue');
-
-    function buildSymptomsHTML() {
-        const parts = Object.keys(symptomLabels)
-            .filter(k => params.get(k) === "1")
-            .map(k => {
-                let label = symptomLabels[k];
-                let extra = "";
-                if (k === "fever") { const d = parseInt(params.get("durationFever")) || 0; extra = ` (${d} days)`; }
-                if (k === "cough") { const d = parseInt(params.get("durationCough")) || 0; extra = ` (${d} days)`; }
-                let consentNote = "";
-                // Fever: only show a consent tag once the fever has lasted more than 3 days.
-                // Otherwise it's omitted entirely (not shown as blank/dash).
-                if (k === "fever") {
-                    const d = parseInt(params.get("durationFever")) || 0;
-                    if (d > 3) { consentNote = params.get("btConsent") === "1" ? " (Consent)" : " (No Consent)"; }
-                }
-                // Cough: only show a consent tag once the cough has lasted more than 20 days.
-                if (k === "cough") {
-                    const d = parseInt(params.get("durationCough")) || 0;
-                    if (d > 20) { consentNote = params.get("xrConsent") === "1" ? " (Consent)" : " (No Consent)"; }
-                }
-                return `<span style="display:inline-block;margin-right:10px;">${label}${extra}<span class="consent-tag">${consentNote}</span></span>`;
-            });
-        return parts.length ? parts.join("") : "—";
-    }
-    document.getElementById('symptomsDisplay').innerHTML = buildSymptomsHTML();
 
     /* 2. NEXT STATION — determine the full priority order internally (lab tests ->
        X-ray -> doctor -> pharmacy, matching the four tests ModelManager.cs actually
