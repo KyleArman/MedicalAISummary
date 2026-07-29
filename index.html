@@ -180,7 +180,8 @@
         }
         .detail-value { color: var(--muted-blue); }
 
-        /* Symptoms with no associated test (e.g. headache) still get a plain row */
+        /* Symptoms with no associated test (e.g. headache, other free-text symptoms)
+           still get a plain row */
         .test-card.no-test .test-detail.consent-row { display: none; }
     </style>
 </head>
@@ -225,13 +226,13 @@
     </div>
 
     <!-- PATIENT SUMMARY -->
-    <!-- Only the four tests that ModelManager.cs actually drives are listed here:
+    <!-- The four tests that ModelManager.cs actually drives are listed here:
          Blood Test (fever > 3 days), Urine Test (urinary hesitancy / amenorrhea),
          Rapid Blood Sugar Test (frequent urination), and X-Ray (cough >= 21 days).
-         There is no "blood pressure test" concept anywhere in ModelManager.cs, so that
-         row has been removed rather than being shown for headache, which the app
-         tracks as a symptom with no associated test or consent (see
-         BuildSymptomSummaryText / FormatSymptomLine in ModelManager.cs). -->
+         Headache and any AI-detected free-text "other" symptoms (otherSymptomList in
+         ModelManager.cs — e.g. sore throat, vomiting, diarrhea, etc.) have no associated
+         test/consent, so they render as plain no-test cards (see BuildSymptomSummaryText /
+         FormatSymptomLine in ModelManager.cs). -->
     <div class="section-card">
         <p class="section-title">Patient Summary</p>
 
@@ -276,6 +277,12 @@
             </div>
             <div class="test-detail consent-row" style="display:none;"></div>
         </div>
+
+        <!-- NEW: AI-detected free-text "other" symptoms (otherSymptomList in ModelManager.cs
+             — e.g. sore throat, vomiting, diarrhea, fatigue, etc.). These carry no
+             test/consent, matching the "other" branch of BuildSymptomSummaryText, so this
+             container is populated dynamically with one no-test card per symptom. -->
+        <div id="otherSymptomsContainer"></div>
 
     </div>
 
@@ -398,6 +405,41 @@
         } else {
             row.style.display = "none";
         }
+    })();
+
+    // NEW: render "other" free-text symptoms (otherSymptomList in ModelManager.cs).
+    // Expected query format (see BuildOtherSymptomsQueryValue in ModelManager.cs):
+    //   otherSymptoms=sore+throat:3|vomiting:-1|rash:2
+    // i.e. entries separated by "|", each entry "name:days" (days = -1 means not mentioned).
+    // The whole value is URI-encoded as a single query param.
+    (function renderOtherSymptoms() {
+        const container = document.getElementById('otherSymptomsContainer');
+        const raw = params.get('otherSymptoms');
+        if (!raw) return;
+
+        const entries = raw.split('|').filter(e => e.trim().length > 0);
+        if (entries.length === 0) return;
+
+        entries.forEach(entry => {
+            const parts = entry.split(':');
+            const name = (parts[0] || '').trim();
+            if (!name) return;
+
+            const days = parts.length > 1 ? parseInt(parts[1]) : -1;
+            const label = name.charAt(0).toUpperCase() + name.slice(1);
+            const daysText = (!isNaN(days) && days > 0) ? ` (${days} day${days === 1 ? '' : 's'})` : '';
+
+            const card = document.createElement('div');
+            card.className = 'test-card no-test';
+            card.style.display = 'flex';
+            card.innerHTML =
+                '<div class="test-card-header"><span class="test-name">' +
+                label + daysText +
+                '</span></div>' +
+                '<div class="test-detail consent-row" style="display:none;"></div>';
+
+            container.appendChild(card);
+        });
     })();
 </script>
 </body>
