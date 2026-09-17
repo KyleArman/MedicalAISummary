@@ -116,11 +116,16 @@
             border-radius: 2px;
         }
 
-        /* NEXT STATION — single destination card (not a multi-step list) */
+        /* NEXT STATION — can show one or more destination rows */
         .next-station {
             display: flex;
             align-items: center;
             gap: 14px;
+        }
+        .next-station + .next-station {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--divider-blue);
         }
         .next-station .station-icon {
             width: 34px;
@@ -207,22 +212,11 @@
         </div>
     </div>
 
-    <!-- NEXT STATION — shows only the single place the patient needs to go next -->
+    <!-- NEXT STATION — shows every place the patient needs to go next before the doctor
+         (e.g. Lab Sample AND Diagnostic Laboratory/X-Ray when both apply). Populated by JS. -->
     <div class="section-card">
         <p class="section-title">Next Station</p>
-        <div class="next-station" id="nextStationDisplay">
-            <div class="station-icon">
-                <!-- Location-pin icon: points the patient to where they need to go next -->
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 21s-7-7.2-7-12a7 7 0 0 1 14 0c0 4.8-7 12-7 12z"/>
-                    <circle cx="12" cy="9" r="2.5"/>
-                </svg>
-            </div>
-            <div class="station-info">
-                <div class="station-name" id="nextStationName">—</div>
-                <div class="station-sub" id="nextStationSub">—</div>
-            </div>
-        </div>
+        <div id="nextStationDisplay"></div>
     </div>
 
     <!-- PATIENT SUMMARY -->
@@ -307,11 +301,21 @@
 
     /* 2. NEXT STATION — determine the full priority order internally (lab tests ->
        X-ray -> doctor -> pharmacy, matching the four tests ModelManager.cs actually
-       drives), but only DISPLAY the single next stop, not the whole route. */
+       drives). Lab Sample and X-Ray are both pre-doctor sample/imaging steps, so when
+       both apply we DISPLAY both instead of only the first one. */
     const hasBlood = params.get("bloodTest") === "1";
     const hasUrine = params.get("urineTest") === "1";
     const hasRbst  = params.get("rapidBloodSugarTest") === "1";
     const hasXRay  = params.get("xRay") === "1";
+
+    // Same duration thresholds used by the Patient Summary cards below, so the
+    // stations shown here stay consistent with what the summary actually requires
+    // (e.g. a patient won't be sent to Lab Sample for a blood test that shows
+    // "(No need)" further down the page).
+    const feverDaysForStation = parseInt(params.get("durationFever")) || 0;
+    const coughDaysForStation = parseInt(params.get("durationCough")) || 0;
+    const needBloodStation = hasBlood && feverDaysForStation > 3;
+    const needXRayStation  = hasXRay  && coughDaysForStation > 20;
 
     const stationDefs = {
         stLab:      { name: "Lab Sample",                     sub: "Blood Test \u00b7 Urine Test \u00b7 Rapid Blood Sugar Test" },
@@ -321,16 +325,35 @@
     };
 
     const stationOrder = [];
-    if (hasBlood || hasUrine || hasRbst) stationOrder.push("stLab");
-    if (hasXRay)  stationOrder.push("stXRay");
+    if (needBloodStation || hasUrine || hasRbst) stationOrder.push("stLab");
+    if (needXRayStation) stationOrder.push("stXRay");
     stationOrder.push("stDoctor");
     stationOrder.push("stPharmacy");
 
-    const nextKey = stationOrder[0];
-    const nextStation = stationDefs[nextKey];
+    // Show every pre-doctor stop (Lab Sample and/or X-Ray) as "next"; if there are
+    // none (patient goes straight to the doctor), fall back to showing just stDoctor.
+    const preDoctorKeys = stationOrder.filter(k => k === "stLab" || k === "stXRay");
+    const nextKeys = preDoctorKeys.length ? preDoctorKeys : [stationOrder[0]];
 
-    document.getElementById('nextStationName').textContent = nextStation.name;
-    document.getElementById('nextStationSub').textContent = nextStation.sub;
+    const pinSvg =
+        '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
+        '<path d="M12 21s-7-7.2-7-12a7 7 0 0 1 14 0c0 4.8-7 12-7 12z"/>' +
+        '<circle cx="12" cy="9" r="2.5"/></svg>';
+
+    const nextStationDisplay = document.getElementById('nextStationDisplay');
+    nextStationDisplay.innerHTML = nextKeys.map((key, i) => {
+        const s = stationDefs[key];
+        // Number the icons only when there is more than one stop, so a single
+        // destination keeps the plain location-pin icon (previous look/feel).
+        const iconContent = nextKeys.length > 1 ? (i + 1) : pinSvg;
+        return '<div class="next-station">' +
+                 '<div class="station-icon">' + iconContent + '</div>' +
+                 '<div class="station-info">' +
+                   '<div class="station-name">' + s.name + '</div>' +
+                   '<div class="station-sub">' + s.sub + '</div>' +
+                 '</div>' +
+               '</div>';
+    }).join('');
 
     /* 3. PATIENT SUMMARY (test rows) */
     function buildSymptoms(keys) {
