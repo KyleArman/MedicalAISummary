@@ -231,7 +231,7 @@
 
     <!-- MAP -->
     <div class="map-card">
-        <h4>PLEASE KEY IN YOUR QUEUE NUMBER IN THE COMPUTER IN-FRONT OF YOUR NEXT DESIGNATED STATION. PLEASE SHOW THIS SUMMARY TO YOUR DOCTOR</h4>
+        <h4>PLEASE KEY IN YOUR QUEUE NUMBER IN THE COMPUTER IN-FRONT OF <span id="nextStationName">DOCTOR'S ROOM</span>. PLEASE SHOW THIS SUMMARY TO YOUR DOCTOR</h4>
         <div class="queue-badge-wrap">
             <span class="queue-badge">
                 <span class="queue-label">Queue Number</span>
@@ -398,6 +398,15 @@
                  '</div>' +
                '</div>';
     }).join('');
+
+    // Keep the map-card heading in sync with the first "Next Station" entry, so it
+    // always points the patient to wherever they actually need to go next (Lab
+    // Sample, Diagnostic Laboratory, or Doctor Room) instead of always saying
+    // "Doctor's Room".
+    const nextStationNameEl = document.getElementById('nextStationName');
+    if (nextStationNameEl && nextKeys.length) {
+        nextStationNameEl.textContent = stationDefs[nextKeys[0]].name.toUpperCase();
+    }
 
     /* 3. PATIENT SUMMARY (test rows) */
     function buildSymptoms(keys) {
