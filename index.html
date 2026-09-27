@@ -21,6 +21,8 @@
             --muted-blue: #6b8aad;
             --divider-blue: #cfe0f5;
             --danger: #d64545;
+            --orange: #f5820e;
+            --orange-dark: #c9660a;
         }
 
         body {
@@ -54,6 +56,39 @@
             letter-spacing: 0.5px;
         }
         .map-card img { width: 100%; height: auto; border-radius: 8px; display: block; }
+
+        /* QUEUE NUMBER BADGE (under the "please key in your queue number" heading) */
+        .queue-badge-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        .queue-badge {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 130px;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+            color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 14px rgba(245, 130, 14, 0.4);
+        }
+        .queue-badge .queue-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            opacity: 0.9;
+            margin-bottom: 2px;
+        }
+        .queue-badge .queue-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            line-height: 1.1;
+        }
 
         /* SUMMARY PANEL */
         .summary-panel {
@@ -197,7 +232,12 @@
     <!-- MAP -->
     <div class="map-card">
         <h4>PLEASE KEY IN YOUR QUEUE NUMBER IN THE COMPUTER IN-FRONT OF DOCTOR'S ROOM. PLEASE SHOW THIS SUMMARY TO YOUR DOCTOR</h4>
-        <span class="summary-value" id="queueNumber">—</span>
+        <div class="queue-badge-wrap">
+            <span class="queue-badge">
+                <span class="queue-label">Queue Number</span>
+                <span class="queue-value" id="queueNumberBadge">—</span>
+            </span>
+        </div>
         <img src="PKUMap.png" alt="PKU Map">
     </div>
 
@@ -298,7 +338,10 @@
     };
 
     if (params.get('name'))  document.getElementById('patientName').textContent  = decodeURIComponent(params.get('name'));
-    if (params.get('queue')) document.getElementById('queueNumber').textContent  = params.get('queue');
+    if (params.get('queue')) {
+        document.getElementById('queueNumber').textContent      = params.get('queue');
+        document.getElementById('queueNumberBadge').textContent = params.get('queue');
+    }
 
     /* 2. NEXT STATION — determine the full priority order internally (lab tests ->
        X-ray -> doctor -> pharmacy, matching the four tests ModelManager.cs actually
