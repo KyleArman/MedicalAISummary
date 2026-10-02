@@ -21,6 +21,8 @@
             --muted-blue: #6b8aad;
             --divider-blue: #cfe0f5;
             --danger: #d64545;
+            --orange: #f5820e;
+            --orange-dark: #c9660a;
         }
 
         body {
@@ -54,6 +56,39 @@
             letter-spacing: 0.5px;
         }
         .map-card img { width: 100%; height: auto; border-radius: 8px; display: block; }
+
+        /* QUEUE NUMBER BADGE (under the "please key in your queue number" heading) */
+        .queue-badge-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        .queue-badge {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 130px;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+            color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 14px rgba(245, 130, 14, 0.4);
+        }
+        .queue-badge .queue-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            opacity: 0.9;
+            margin-bottom: 2px;
+        }
+        .queue-badge .queue-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            line-height: 1.1;
+        }
 
         /* SUMMARY PANEL */
         .summary-panel {
@@ -196,8 +231,14 @@
 
     <!-- MAP -->
     <div class="map-card">
-        <h4>PKU SUMMARY PAGE</h4>
-        <img src="PKUMap.png" alt="PKU Map">
+        <h4>PLEASE CONFIRM YOUR QUEUE NUMBER AT THE COMPUTER IN FRONT OF <span id="nextStationName">DOCTOR'S ROOM</span>. PLEASE SHOW THIS SUMMARY TO YOUR DOCTOR</h4>
+        <div class="queue-badge-wrap">
+            <span class="queue-badge">
+                <span class="queue-label">Queue Number</span>
+                <span class="queue-value" id="queueNumberBadge">—</span>
+            </span>
+        </div>
+        <img src="PKUMap.png" alt="PKU Map" id="mapImage">
     </div>
 
     <!-- PATIENT OVERVIEW (name / queue at a glance) -->
@@ -219,14 +260,6 @@
         <div id="nextStationDisplay"></div>
     </div>
 
-    <!-- PATIENT SUMMARY -->
-    <!-- The four tests that ModelManager.cs actually drives are listed here:
-         Blood Test (fever > 3 days), Urine Test (urinary hesitancy / amenorrhea),
-         Rapid Blood Sugar Test (frequent urination), and X-Ray (cough >= 21 days).
-         Headache and any AI-detected free-text "other" symptoms (otherSymptomList in
-         ModelManager.cs — e.g. sore throat, vomiting, diarrhea, etc.) have no associated
-         test/consent, so they render as plain no-test cards (see BuildSymptomSummaryText /
-         FormatSymptomLine in ModelManager.cs). -->
     <div class="section-card">
         <p class="section-title">Patient Summary</p>
 
@@ -297,7 +330,10 @@
     };
 
     if (params.get('name'))  document.getElementById('patientName').textContent  = decodeURIComponent(params.get('name'));
-    if (params.get('queue')) document.getElementById('queueNumber').textContent  = params.get('queue');
+    if (params.get('queue')) {
+        document.getElementById('queueNumber').textContent      = params.get('queue');
+        document.getElementById('queueNumberBadge').textContent = params.get('queue');
+    }
 
     /* 2. NEXT STATION — determine the full priority order internally (lab tests ->
        X-ray -> doctor -> pharmacy, matching the four tests ModelManager.cs actually
@@ -322,6 +358,13 @@
         stXRay:     { name: "Diagnostic Laboratory",          sub: "X-Ray" },
         stDoctor:   { name: "Doctor Room",                    sub: "See the Doctor" },
         stPharmacy: { name: "Pharmacy Counter",               sub: "Collect Prescribed Medicine" }
+    };
+
+    // Map image shown for each station — swap these filenames for your actual assets.
+    const stationImages = {
+        stLab:      "PKUMap_Lab.png",
+        stXRay:     "PKUMap_XRay.png",
+        stDoctor:   "PKUMap.png"
     };
 
     const stationOrder = [];
@@ -354,6 +397,18 @@
                  '</div>' +
                '</div>';
     }).join('');
+
+    // Keep the map-card heading in sync with the first "Next Station" entry, so it
+    // always points the patient to wherever they actually need to go next (Lab
+    // Sample, Diagnostic Laboratory, or Doctor Room) instead of always saying
+    // "Doctor's Room".
+    const nextStationNameEl = document.getElementById('nextStationName');
+    const mapImageEl = document.getElementById('mapImage');
+    if (nextKeys.length) {
+        const firstKey = nextKeys[0];
+        if (nextStationNameEl) nextStationNameEl.textContent = stationDefs[firstKey].name.toUpperCase();
+        if (mapImageEl && stationImages[firstKey]) mapImageEl.src = stationImages[firstKey];
+    }
 
     /* 3. PATIENT SUMMARY (test rows) */
     function buildSymptoms(keys) {
